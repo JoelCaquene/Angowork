@@ -17,19 +17,33 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-mudar-isso-em-producao')
 
 # ======================================================================
-# CONFIGURAÇÃO DOS HOSTS PERMITIDOS E CSRF
+# CONFIGURAÇÃO DOS HOSTS PERMITIDOS E CSRF (CORRIGIDO PARA DOMÍNIO PRÓPRIO)
 # ======================================================================
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1', 'http://localhost']
 
-# Adiciona o domínio do Render dinamicamente
+# Lê a lista de domínios do painel do Render. Se estiver vazio, usa o padrão local.
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
+
+CSRF_TRUSTED_ORIGINS = []
+
+# Configura as origens confiáveis (CSRF) dinamicamente com base nos domínios permitidos
+for host in ALLOWED_HOSTS:
+    host = host.strip()
+    if host:
+        CSRF_TRUSTED_ORIGINS.append(f"https://{host}")
+        CSRF_TRUSTED_ORIGINS.append(f"http://{host}")
+
+# Garante que o hostname padrão do Render também funcione
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-    ALLOWED_HOSTS.append(f"{RENDER_EXTERNAL_HOSTNAME}.onrender.com")
-    # Importante para o Django 4.x+ não bloquear formulários
-    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
-    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}.onrender.com")
+    if RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    
+    # Adiciona protocolos para o hostname do Render
+    render_url = f"https://{RENDER_EXTERNAL_HOSTNAME}"
+    if render_url not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(render_url)
+
+# ======================================================================
 
 # Application definition
 INSTALLED_APPS = [
