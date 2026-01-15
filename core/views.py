@@ -100,7 +100,7 @@ def user_logout(request):
     logout(request)
     return redirect('menu')
 
-# --- DEPÓSITO (ATUALIZADO COM MULTI-MÉTODOS) ---
+# --- DEPÓSITO ---
 @login_required
 def deposito(request):
     platform_bank_details = PlatformBankDetails.objects.all()
@@ -155,15 +155,14 @@ def approve_deposit(request, deposit_id):
         messages.success(request, f'Depósito de {deposit.amount} aprovado para {deposit.user.phone_number}.')
     return redirect('renda')
 
+# --- SAQUE (CORRIGIDO) ---
 @login_required
 def saque(request):
-    # Configurações básicas
     MIN_WITHDRAWAL_AMOUNT = 2500
     platform_settings = PlatformSettings.objects.first()
     withdrawal_instruction = platform_settings.withdrawal_instruction if platform_settings else ''
     withdrawal_records = Withdrawal.objects.filter(user=request.user).order_by('-created_at')
     
-    # Validação de 1 saque por dia
     today = timezone.localdate(timezone.now())
     withdrawals_today_count = Withdrawal.objects.filter(
         user=request.user, 
@@ -175,7 +174,6 @@ def saque(request):
     if request.method == 'POST':
         form = WithdrawalForm(request.POST)
         
-        # Captura todos os campos do formulário HTML
         metodo = request.POST.get('withdrawal_method')
         bank_name = request.POST.get('bank_name')
         iban = request.POST.get('iban')
@@ -186,7 +184,6 @@ def saque(request):
         if form.is_valid():
             amount = form.cleaned_data['amount']
             
-            # Validações de Regra de Negócio
             if not metodo:
                 messages.error(request, 'Selecione um método de levantamento.')
             elif not can_withdraw_today:
@@ -196,7 +193,6 @@ def saque(request):
             elif request.user.available_balance < amount:
                 messages.error(request, 'Saldo insuficiente para esta operação.')
             else:
-                # Criar string de detalhes para o administrador ver no painel
                 detalhes = f"Método: {metodo} | "
                 if metodo == 'BANCO':
                     detalhes += f"Banco: {bank_name}, IBAN: {iban}, Titular: {holder}"
@@ -205,16 +201,15 @@ def saque(request):
                 elif metodo == 'USDT':
                     detalhes += f"Carteira: {usdt_addr}"
 
-                # Cria o registro no banco de dados
-                # Nota: Certifique-se que seu modelo Withdrawal tenha um campo para 'detalhes' ou 'payment_method'
+                # CORREÇÃO AQUI: Usando o nome correto 'withdrawal_details' que está no seu models.py
+                # E também o campo 'method'
                 Withdrawal.objects.create(
                     user=request.user, 
                     amount=amount,
-                    # Se o seu model não tiver o campo 'payment_details', salve no campo que você usa para info bancária
-                    payment_details=detalhes 
+                    method=metodo,
+                    withdrawal_details=detalhes 
                 )
 
-                # Deduz o saldo do usuário
                 request.user.available_balance -= amount
                 request.user.save()
                 
@@ -227,7 +222,7 @@ def saque(request):
         'withdrawal_instruction': withdrawal_instruction,
         'withdrawal_records': withdrawal_records,
         'form': form,
-        'is_time_to_withdraw': True, # Forçado True para liberar 24h
+        'is_time_to_withdraw': True,
         'MIN_WITHDRAWAL_AMOUNT': MIN_WITHDRAWAL_AMOUNT,
         'can_withdraw_today': can_withdraw_today,
     }
@@ -347,7 +342,7 @@ def nivel(request):
     
     context = {
         'levels': Level.objects.all().order_by('deposit_value'),
-        'user_levels': UserLevel.objects.filter(user=request.user, is_active=True).values_list('level__id', flat=True),
+        'user_levels': UserLevel.objects.filter(request.user, is_active=True).values_list('level__id', flat=True),
     }
     return render(request, 'nivel.html', context)
 
@@ -477,3 +472,4 @@ def renda(request):
         'total_income': total_income,
     }
     return render(request, 'renda.html', context)
+    
