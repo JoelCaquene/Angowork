@@ -4,7 +4,6 @@ from django.utils import timezone
 import uuid
 
 # --- GERENCIADOR DE USUÁRIO ---
-
 class CustomUserManager(BaseUserManager):
     def create_user(self, phone_number, password=None, **extra_fields):
         if not phone_number:
@@ -21,7 +20,6 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(phone_number, password, **extra_fields)
 
 # --- MODELO DE USUÁRIO ---
-
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=20, unique=True, verbose_name="Número de Telefone")
     full_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Nome Completo")
@@ -54,100 +52,51 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         super().save(*args, **kwargs)
 
 # --- CONFIGURAÇÕES E BANCOS ---
-
 class PlatformSettings(models.Model):
-    whatsapp_link = models.URLField(verbose_name="Link do WhatsApp", help_text="Link para suporte.")
+    whatsapp_link = models.URLField(verbose_name="Link do WhatsApp")
     history_text = models.TextField(verbose_name="Texto 'Sobre'")
     deposit_instruction = models.TextField(verbose_name="Instrução Depósito")
     withdrawal_instruction = models.TextField(verbose_name="Instrução Saque")
-    
-    class Meta:
-        verbose_name = "Configuração da Plataforma"
-        verbose_name_plural = "Configurações da Plataforma"
 
 class PlatformBankDetails(models.Model):
-    bank_name = models.CharField(max_length=100, verbose_name="Nome do Banco/Rede")
-    IBAN = models.CharField(max_length=100, verbose_name="IBAN / Chave PIX / Carteira")
-    account_holder_name = models.CharField(max_length=100, verbose_name="Titular")
-
-    class Meta:
-        verbose_name = "Conta da Plataforma"
-        verbose_name_plural = "Contas da Plataforma"
+    bank_name = models.CharField(max_length=100)
+    IBAN = models.CharField(max_length=100)
+    account_holder_name = models.CharField(max_length=100)
 
 class BankDetails(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="bank_details")
-    bank_name = models.CharField(max_length=100, verbose_name="Banco")
-    IBAN = models.CharField(max_length=100, verbose_name="IBAN / Chave PIX")
-    account_holder_name = models.CharField(max_length=100, verbose_name="Titular")
-
-    class Meta:
-        verbose_name = "Dados Bancários do Usuário"
-        verbose_name_plural = "Dados Bancários dos Usuários"
+    bank_name = models.CharField(max_length=100)
+    IBAN = models.CharField(max_length=100)
+    account_holder_name = models.CharField(max_length=100)
 
 # --- FLUXO FINANCEIRO ---
-
 class Deposit(models.Model):
-    PAYMENT_METHODS = [
-        ('bank', 'Banco (Angola)'),
-        ('pix', 'PIX (Brasil)'),
-        ('trc20', 'Cripto (USDT TRC20)'),
-    ]
-
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name="Usuário")
-    amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Valor")
-    payment_method = models.CharField(max_length=10, choices=PAYMENT_METHODS, default='bank', verbose_name="Método")
-    payer_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Nome/ID do Comprovativo")
-    proof_of_payment = models.ImageField(upload_to='deposit_proofs/', verbose_name="Comprovativo")
-    is_approved = models.BooleanField(default=False, verbose_name="Aprovado")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data")
-    
-    class Meta:
-        verbose_name = "Depósito"
-        verbose_name_plural = "Depósitos"
-
-    def __str__(self):
-        return f"{self.user.phone_number} - {self.amount} ({self.get_payment_method_display()})"
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    payment_method = models.CharField(max_length=20)
+    payer_name = models.CharField(max_length=255, blank=True, null=True)
+    proof_of_payment = models.ImageField(upload_to='deposit_proofs/')
+    is_approved = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
 class Withdrawal(models.Model):
-    STATUS_CHOICES = [
-        ('Pendente', 'Pendente'),
-        ('Aprovado', 'Aprovado'),
-        ('Recusado', 'Recusado'),
-    ]
-    
-    # Adicionado suporte a múltiplos métodos no saque
-    WITHDRAWAL_METHODS = [
-        ('bank', 'Banco (IBAN)'),
-        ('pix', 'PIX'),
-        ('usdt', 'USDT (TRC20)'),
-    ]
-
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, verbose_name="Usuário")
-    amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Valor")
-    method = models.CharField(max_length=10, choices=WITHDRAWAL_METHODS, default='bank', verbose_name="Método Escolhido")
-    withdrawal_details = models.TextField(blank=True, null=True, verbose_name="Dados do Recebimento", help_text="Ex: IBAN ou Chave PIX usada no momento do saque")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pendente', verbose_name="Status")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Data de Solicitação")
-
-    class Meta:
-        verbose_name = "Saque"
-        verbose_name_plural = "Saques"
-
-    def __str__(self):
-        return f"{self.user.phone_number} - {self.amount} ({self.status})"
+    STATUS_CHOICES = [('Pendente', 'Pendente'), ('Aprovado', 'Aprovado'), ('Recusado', 'Recusado')]
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    method = models.CharField(max_length=20)
+    withdrawal_details = models.TextField(blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pendente')
+    created_at = models.DateTimeField(auto_now_add=True)
 
 # --- NÍVEIS E TAREFAS ---
-
 class Level(models.Model):
-    name = models.CharField(max_length=50, unique=True, verbose_name="Nome do Nível")
-    deposit_value = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Custo de Ativação")
-    daily_gain = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Ganho Diário")
-    monthly_gain = models.DecimalField(max_digits=12, decimal_places=2, verbose_name="Ganho Mensal")
-    cycle_days = models.IntegerField(verbose_name="Dias de Ciclo")
-    image = models.ImageField(upload_to='level_images/', verbose_name="Ícone/Imagem")
-
-    def __str__(self):
-        return self.name
+    name = models.CharField(max_length=50, unique=True)
+    deposit_value = models.DecimalField(max_digits=12, decimal_places=2)
+    daily_gain = models.DecimalField(max_digits=12, decimal_places=2)
+    monthly_gain = models.DecimalField(max_digits=12, decimal_places=2)
+    cycle_days = models.IntegerField()
+    image = models.ImageField(upload_to='level_images/')
+    def __str__(self): return self.name
 
 class UserLevel(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
@@ -161,7 +110,6 @@ class Task(models.Model):
     completed_at = models.DateTimeField(auto_now_add=True)
 
 # --- ROLETA ---
-
 class Roulette(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     prize = models.DecimalField(max_digits=12, decimal_places=2)
@@ -169,9 +117,5 @@ class Roulette(models.Model):
     is_approved = models.BooleanField(default=True)
 
 class RouletteSettings(models.Model):
-    prizes = models.CharField(max_length=255, help_text="Lista de prêmios separados por vírgula. Ex: 0,500,1000,5000")
-
-    class Meta:
-        verbose_name = "Configuração da Roleta"
-        verbose_name_plural = "Configurações da Roleta"
-        
+    prizes = models.CharField(max_length=255, help_text="Ex: 0,500,1000")
+    

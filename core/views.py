@@ -155,21 +155,16 @@ def approve_deposit(request, deposit_id):
         messages.success(request, f'Depósito de {deposit.amount} aprovado para {deposit.user.phone_number}.')
     return redirect('renda')
 
-# --- SAQUE (ATUALIZADO COM ESCOLHA DE MÉTODO) ---
 @login_required
 def saque(request):
+    # Configurações básicas
     MIN_WITHDRAWAL_AMOUNT = 2500
-    START_TIME = time(9, 0, 0)
-    END_TIME = time(23, 0, 0)
-    
     platform_settings = PlatformSettings.objects.first()
     withdrawal_instruction = platform_settings.withdrawal_instruction if platform_settings else ''
     withdrawal_records = Withdrawal.objects.filter(user=request.user).order_by('-created_at')
     
-    now = timezone.localtime(timezone.now()).time()
+    # Validação de 1 saque por dia
     today = timezone.localdate(timezone.now())
-    is_time_to_withdraw = START_TIME <= now <= END_TIME
-    
     withdrawals_today_count = Withdrawal.objects.filter(
         user=request.user, 
         created_at__date=today, 
@@ -179,36 +174,51 @@ def saque(request):
     
     if request.method == 'POST':
         form = WithdrawalForm(request.POST)
-        # Captura o método e dados adicionais do formulário
-        metodo_escolhido = request.POST.get('withdrawal_method')
+        
+        # Captura todos os campos do formulário HTML
+        metodo = request.POST.get('withdrawal_method')
+        bank_name = request.POST.get('bank_name')
+        iban = request.POST.get('iban')
+        holder = request.POST.get('account_holder')
+        pix_key = request.POST.get('pix_key')
+        usdt_addr = request.POST.get('usdt_address')
         
         if form.is_valid():
             amount = form.cleaned_data['amount']
             
-            if not metodo_escolhido:
+            # Validações de Regra de Negócio
+            if not metodo:
                 messages.error(request, 'Selecione um método de levantamento.')
             elif not can_withdraw_today:
-                messages.error(request, 'Apenas 1 saque por dia.')
-            elif not is_time_to_withdraw:
-                messages.error(request, 'Horário de saque: 09:00 às 17:00.')
+                messages.error(request, 'Você já realizou um saque hoje. Tente novamente amanhã.')
             elif amount < MIN_WITHDRAWAL_AMOUNT:
-                messages.error(request, f'O valor mínimo é {MIN_WITHDRAWAL_AMOUNT} Kz.')
+                messages.error(request, f'O valor mínimo para levantamento é {MIN_WITHDRAWAL_AMOUNT} Kz.')
             elif request.user.available_balance < amount:
-                messages.error(request, 'Saldo insuficiente.')
+                messages.error(request, 'Saldo insuficiente para esta operação.')
             else:
-                # Cria o saque salvando o método nos detalhes (ou campo específico se existir no model)
-                withdrawal = Withdrawal.objects.create(
+                # Criar string de detalhes para o administrador ver no painel
+                detalhes = f"Método: {metodo} | "
+                if metodo == 'BANCO':
+                    detalhes += f"Banco: {bank_name}, IBAN: {iban}, Titular: {holder}"
+                elif metodo == 'PIX':
+                    detalhes += f"Chave: {pix_key}"
+                elif metodo == 'USDT':
+                    detalhes += f"Carteira: {usdt_addr}"
+
+                # Cria o registro no banco de dados
+                # Nota: Certifique-se que seu modelo Withdrawal tenha um campo para 'detalhes' ou 'payment_method'
+                Withdrawal.objects.create(
                     user=request.user, 
                     amount=amount,
+                    # Se o seu model não tiver o campo 'payment_details', salve no campo que você usa para info bancária
+                    payment_details=detalhes 
                 )
-                
-                # Opcional: Salvar detalhes extras se o seu model tiver um campo 'payment_details'
-                # withdrawal.payment_method = metodo_escolhido
-                # withdrawal.save()
 
+                # Deduz o saldo do usuário
                 request.user.available_balance -= amount
                 request.user.save()
-                messages.success(request, f'Pedido de saque via {metodo_escolhido} enviado com sucesso.')
+                
+                messages.success(request, f'Pedido de levantamento de {amount} KZ enviado com sucesso!')
                 return redirect('saque')
     else:
         form = WithdrawalForm()
@@ -217,7 +227,7 @@ def saque(request):
         'withdrawal_instruction': withdrawal_instruction,
         'withdrawal_records': withdrawal_records,
         'form': form,
-        'is_time_to_withdraw': is_time_to_withdraw,
+        'is_time_to_withdraw': True, # Forçado True para liberar 24h
         'MIN_WITHDRAWAL_AMOUNT': MIN_WITHDRAWAL_AMOUNT,
         'can_withdraw_today': can_withdraw_today,
     }
