@@ -84,6 +84,8 @@ class Withdrawal(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     method = models.CharField(max_length=50)
+    # AJUSTE AQUI: Adicionado payment_details para bater com o código da View
+    payment_details = models.TextField(blank=True, null=True) 
     withdrawal_details = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pendente')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -118,3 +120,4 @@ class Roulette(models.Model):
 
 class RouletteSettings(models.Model):
     prizes = models.CharField(max_length=255, help_text="Ex: 0,500,1000")
+    
