@@ -73,7 +73,7 @@ class BankDetails(models.Model):
 class Deposit(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
-    payment_method = models.CharField(max_length=20)
+    payment_method = models.CharField(max_length=50)
     payer_name = models.CharField(max_length=255, blank=True, null=True)
     proof_of_payment = models.ImageField(upload_to='deposit_proofs/')
     is_approved = models.BooleanField(default=False)
@@ -83,7 +83,7 @@ class Withdrawal(models.Model):
     STATUS_CHOICES = [('Pendente', 'Pendente'), ('Aprovado', 'Aprovado'), ('Recusado', 'Recusado')]
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
-    method = models.CharField(max_length=20)
+    method = models.CharField(max_length=50)
     withdrawal_details = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pendente')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -118,4 +118,3 @@ class Roulette(models.Model):
 
 class RouletteSettings(models.Model):
     prizes = models.CharField(max_length=255, help_text="Ex: 0,500,1000")
-    

@@ -47,6 +47,8 @@ class DepositForm(forms.ModelForm):
 
 class WithdrawalForm(forms.Form):
     amount = forms.DecimalField(max_digits=10, decimal_places=2, label="Valor a Sacar")
+    # Campo adicionado para processar o método escolhido no HTML (BANCO, PIX ou USDT)
+    withdrawal_method = forms.CharField(max_length=20, required=False)
 
 class BankDetailsForm(forms.ModelForm):
     class Meta:
