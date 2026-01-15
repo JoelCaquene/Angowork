@@ -342,7 +342,8 @@ def nivel(request):
     
     context = {
         'levels': Level.objects.all().order_by('deposit_value'),
-        'user_levels': UserLevel.objects.filter(request.user, is_active=True).values_list('level__id', flat=True),
+        # CORREÇÃO: Adicionado 'user=' antes de request.user para evitar erro de iteração
+        'user_levels': UserLevel.objects.filter(user=request.user, is_active=True).values_list('level__id', flat=True),
     }
     return render(request, 'nivel.html', context)
 
