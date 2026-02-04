@@ -46,11 +46,15 @@
 
 <div class="forex-dashboard">
     
-    {# TOPO SUPERIOR #}
+    {# TOPO SUPERIOR COM BOTÃO DE DOWNLOAD ADICIONADO #}
     <div class="top-header">
         <a href="{% url 'logout' %}" class="btn-sair-topo">SAIR</a>
         <h1 class="logo-angowork">ANGOWORK</h1>
-        <div style="width: 50px;"></div>
+        
+        <a href="{% static 'app/angowork.apk' %}" download class="btn-download-app">
+            <i class="fas fa-download"></i>
+            <span>APP</span>
+        </a>
     </div>
 
     {# PAINEL DE INDICADORES (6 INDICADORES) #}
@@ -106,10 +110,6 @@
         </a>
     </div>
 
-    <div 
-        </p>.</div>
-    </div>
-{# SEÇÃO DE APOIO CLIENTE #}
     <div class="licenca-container" style="text-align: center; padding: 20px;">
         <img src="{% static 'images/logo_isj.png' %}" alt="Logo ISJ" class="isj-logo" style="max-width: 80px; margin-bottom: 10px;">
         
@@ -180,6 +180,22 @@
     }
 
     .forex-dashboard { width: 100%; max-width: 500px; margin: 0 auto; padding-bottom: 110px; }
+
+    /* --- ESTILO DO BOTÃO DE DOWNLOAD (NOVO) --- */
+    .btn-download-app {
+        background: #3b82f6;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 10px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+    }
+    .btn-download-app i { font-size: 12px; }
 
     /* --- MODAL STYLE --- */
     .modal-overlay { 
