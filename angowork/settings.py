@@ -26,8 +26,17 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(','
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+    if RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
+# ADICIONADO: Seus domínios personalizados para produção
+ALLOWED_HOSTS.extend([
+    'angowork.art',
+    'www.angowork.art',
+    'angowork.onrender.com'
+])
+
+# Configuração de origens confiáveis para CSRF
 CSRF_TRUSTED_ORIGINS = [f"https://{host.strip()}" for host in ALLOWED_HOSTS if host.strip()]
 
 # ======================================================================
@@ -95,6 +104,7 @@ DATABASES = {
 LANGUAGE_CODE = 'pt-br'
 TIME_ZONE = 'Africa/Luanda'
 USE_I18N = True
+USE_L10N = True
 USE_TZ = True
 
 LANGUAGES = [
@@ -103,7 +113,10 @@ LANGUAGES = [
     ('fr', _('Français')),
 ]
 
-LOCALE_PATHS = [BASE_DIR / 'locale']
+# Caminho onde as pastas de tradução (locale) ficarão
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
+]
 
 # ======================================================================
 # STATIC E MEDIA FILES
