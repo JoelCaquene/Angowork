@@ -1,65 +1,80 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Plano de Produção - Profissional{% endblock %}
+{% block title %}Adquira Função - Profissional{% endblock %}
 
 {% block content %}
 <div class="level-container">
     
-    {# Cabeçalho Estruturado com Card e Seta Minimalista #}
+    {# Cabeçalho Estruturado #}
     <div class="top-header-card">
         <a href="{% url 'home' %}" class="back-arrow-only">
             <i class="fas fa-arrow-left"></i>
         </a>
         <div class="header-title-box">
-            <h1 class="main-title">PLANO DE PRODUÇÃO</h1>
+            <h1 class="main-title">ADQUIRA FUNÇÃO</h1>
         </div>
         <div class="header-spacer"></div>
     </div>
 
-    {# Grid de Planos - 2 por linha ocupando as laterais #}
-    <div class="level-grid">
+    {# Aviso de Compromisso e Garantia #}
+    <div class="job-notice-box">
+        <div class="notice-icon">
+            <i class="fas fa-user-check"></i>
+        </div>
+        <p class="notice-text">
+            O depósito realizado não é um simples investimento, é uma <strong>garantia de aquisição de vaga</strong>, marcando assim o seu compromisso com a empresa.
+        </p>
+    </div>
+
+    {# Lista de Planos/Funções #}
+    <div class="level-list">
         {% for level in levels %}
-        <div class="level-card {% if level.id in user_levels %}active-card{% endif %}">
+        <div class="level-card-premium {% if level.id in user_levels %}active-card{% endif %}">
             
-            {# Identificador do Nível #}
-            <div class="card-header-simple">
-                <i class="fas fa-gem icon-level"></i>
-                <span class="level-name">NÍVEL {{ level.name }}</span>
+            {# Parte Superior: Informações #}
+            <div class="card-main-content">
+                <div class="card-left">
+                    <div class="level-badge">
+                        <i class="fas fa-briefcase icon-level"></i>
+                        <span class="level-name">{{ level.name }}</span>
+                    </div>
+                    <div class="price-tag">
+                        <span class="info-label">Taxa de Adesão</span>
+                        <span class="info-value text-gold">KZ {{ level.deposit_value }}</span>
+                    </div>
+                </div>
+
+                <div class="card-center">
+                    <div class="stats-grid">
+                        <div class="stat-box">
+                            <span class="info-label">Salário Diário</span>
+                            <span class="info-value text-green">KZ {{ level.daily_gain }}</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="info-label">Rendimento Mensal</span>
+                            <span class="info-value text-blue">KZ {{ level.monthly_gain }}</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="info-label">Vigência</span>
+                            <span class="info-value text-contract-green">CONTRATO 1 ANO</span>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            {# Dados Financeiros Simplificados #}
-            <div class="card-body-simple">
-                <div class="info-row">
-                    <span class="info-label">Recarga</span>
-                    <span class="info-value text-gold">KZ {{ level.deposit_value }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Tarefa</span>
-                    <span class="info-value text-green">KZ {{ level.daily_gain }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Mensal</span>
-                    <span class="info-value text-blue">KZ {{ level.monthly_gain }}</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Contrato</span>
-                    <span class="info-value">{{ level.cycle_days }} Dias</span>
-                </div>
-            </div>
-
-            {# Ação do Card: Se já tem o nível, aparece ACTIVO, se não, aparece ADQUIRIR #}
-            <div class="card-footer-simple">
+            {# Parte Inferior: Botão/Ação #}
+            <div class="card-footer-action">
                 {% if level.id in user_levels %}
-                    <div class="badge-acquired">
-                        <i class="fas fa-check-circle"></i> ACTIVO
+                    <div class="status-active-banner">
+                        <i class="fas fa-user-tie"></i> FUNÇÃO ATRIBUÍDA COM SUCESSO
                     </div>
                 {% else %}
-                    <form method="post" action="{% url 'nivel' %}">
+                    <form method="post" action="{% url 'nivel' %}" style="width: 100%;">
                         {% csrf_token %}
                         <input type="hidden" name="level_id" value="{{ level.id }}">
-                        <button type="submit" class="btn-buy-simple">
-                            ADQUIRIR <i class="fas fa-arrow-right"></i>
+                        <button type="submit" class="btn-activate-full">
+                            ADQUIRIR VAGA AGORA <i class="fas fa-check-double"></i>
                         </button>
                     </form>
                 {% endif %}
@@ -70,194 +85,198 @@
 </div>
 
 <style>
-    /* FUNDO BRANCO E OCUPAÇÃO TOTAL */
-    body {
-        background-color: #ffffff !important;
-        margin: 0;
-        padding: 0;
-        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        color: #333;
+    /* BLOQUEIO DE ROLAGEM LATERAL */
+    html, body {
+        max-width: 100%;
+        overflow-x: hidden;
+        background-color: #f1f5f9 !important;
+        margin: 0; padding: 0;
+        font-family: 'Inter', sans-serif;
     }
 
     .level-container {
         width: 100%;
-        max-width: 100%;
-        padding: 10px 10px 100px 10px;
+        max-width: 100vw;
+        padding: 10px 15px 100px 15px;
         box-sizing: border-box;
     }
 
-    /* CARD DE CABEÇALHO E SETA VOLTAR */
+    /* HEADER */
     .top-header-card {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background: #ffffff;
-        padding: 15px 5px;
-        margin-bottom: 20px;
-        border-bottom: 1px solid #f0f0f0;
+        margin-bottom: 15px;
     }
 
     .back-arrow-only {
-        width: 40px;
-        height: 40px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #f8fafc;
-        color: #1e293b;
+        width: 42px; height: 42px;
+        display: flex; align-items: center; justify-content: center;
+        background: #fff; color: #1e293b;
+        border-radius: 12px; border: 1px solid #e2e8f0;
         text-decoration: none;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        font-size: 18px;
-        transition: 0.2s;
-    }
-
-    .back-arrow-only:active {
-        transform: scale(0.9);
-        background: #e2e8f0;
     }
 
     .header-title-box {
-        background: #f1f5f9;
-        padding: 10px 15px;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        background: #1e293b;
+        padding: 10px 20px;
+        border-radius: 10px;
+        flex-grow: 1;
+        margin: 0 12px;
+        text-align: center;
     }
 
     .main-title {
-        font-size: 13px;
-        font-weight: 800;
-        color: #0f172a;
-        margin: 0;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        font-size: 14px; font-weight: 800;
+        color: #fff; margin: 0;
+        letter-spacing: 1px;
     }
 
-    .header-spacer { width: 40px; }
+    .header-spacer { width: 42px; }
 
-    /* GRID OCUPANDO TODA A LARGURA */
-    .level-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-        width: 100%;
-    }
-
-    /* CARD SIMPLIFICADO */
-    .level-card {
+    /* AVISO DE COMPROMISSO */
+    .job-notice-box {
         background: #fff;
-        border: 1px solid #f1f5f9;
-        border-radius: 14px;
-        padding: 12px 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        border-left: 4px solid #2563eb;
+        padding: 12px 15px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .notice-icon {
+        font-size: 20px;
+        color: #2563eb;
+    }
+
+    .notice-text {
+        font-size: 11px;
+        color: #475569;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    .notice-text strong { color: #1e293b; }
+
+    /* CARD DE FUNÇÃO */
+    .level-card-premium {
+        background: #fff;
+        border-radius: 16px;
+        margin-bottom: 15px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.04);
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        transition: 0.3s;
+        overflow: hidden;
     }
 
-    /* ESTILO PARA CARD JÁ ADQUIRIDO (ACTIVO) */
     .active-card {
         border: 2px solid #10b981;
-        background: #f0fdf4; /* Verde bem clarinho de fundo */
+        background: #f0fdf4;
     }
 
-    /* CABEÇALHO INTERNO DO CARD */
-    .card-header-simple {
+    .card-main-content {
+        display: flex;
+        padding: 15px;
+        align-items: center;
+    }
+
+    .card-left {
+        flex: 1.2;
+        border-right: 1px solid #f1f5f9;
+        padding-right: 8px;
+    }
+
+    .card-center {
+        flex: 2;
+        padding-left: 10px;
+    }
+
+    .level-badge {
         display: flex;
         align-items: center;
         gap: 6px;
-        margin-bottom: 10px;
+        margin-bottom: 6px;
     }
 
-    .icon-level {
-        color: #3b82f6;
-        font-size: 11px;
+    .icon-level { color: #2563eb; font-size: 16px; }
+    .level-name { font-size: 15px; font-weight: 900; color: #0f172a; text-transform: uppercase; }
+
+    .info-label { 
+        display: block;
+        font-size: 8.5px; 
+        color: #64748b; 
+        font-weight: 700; 
+        text-transform: uppercase; 
+        margin-bottom: 1px;
     }
 
-    .level-name {
-        font-size: 11px;
-        font-weight: 800;
-        color: #1e293b;
-    }
-
-    /* CORPO DO CARD */
-    .card-body-simple {
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-    }
-
-    .info-row {
-        display: flex;
-        flex-direction: column;
-        line-height: 1.2;
-    }
-
-    .info-label {
-        font-size: 8.5px;
-        color: #64748b;
-        text-transform: uppercase;
-        font-weight: 600;
-    }
-
-    .info-value {
-        font-size: 12px;
-        font-weight: 700;
-    }
-
+    .info-value { font-size: 13px; font-weight: 800; display: block; }
+    
     .text-gold { color: #b45309; }
-    .text-green { color: #059669; }
+    .text-green { color: #10b981; }
     .text-blue { color: #2563eb; }
+    .text-contract-green { color: #059669; }
 
-    /* BOTÕES E SELOS */
-    .card-footer-simple {
-        margin-top: 12px;
+    .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
     }
 
-    .btn-buy-simple {
+    .stat-box:last-child {
+        grid-column: span 2;
+        background: #f8fafc;
+        padding: 4px;
+        border-radius: 6px;
+        margin-top: 4px;
+        border: 1px dashed #cbd5e1;
+    }
+
+    /* BOTÃO E RODAPÉ */
+    .card-footer-action {
+        padding: 0 15px 15px 15px;
+    }
+
+    .btn-activate-full {
         width: 100%;
         background: #2563eb;
         color: white;
         border: none;
-        padding: 10px;
-        border-radius: 8px;
-        font-size: 10px;
+        padding: 14px;
+        border-radius: 12px;
+        font-size: 13px;
         font-weight: 800;
         cursor: pointer;
         display: flex;
-        justify-content: center;
         align-items: center;
-        gap: 4px;
-        transition: 0.2s;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
     }
 
-    .btn-buy-simple:active {
-        transform: scale(0.96);
-    }
-
-    /* SELO VERDE PARA PRODUTO JÁ COMPRADO */
-    .badge-acquired {
+    .status-active-banner {
         background: #10b981;
         color: white;
         text-align: center;
-        padding: 10px;
-        border-radius: 8px;
-        font-size: 10px;
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 11px;
         font-weight: 800;
         display: flex;
-        justify-content: center;
         align-items: center;
-        gap: 5px;
-        box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+        justify-content: center;
+        gap: 8px;
     }
 
-    /* Ocupação máxima em dispositivos móveis */
+    /* MOBILE ADJUSTS */
     @media (max-width: 380px) {
-        .level-grid { gap: 8px; }
-        .level-card { padding: 10px 8px; }
-        .info-value { font-size: 11px; }
+        .level-name { font-size: 13px; }
+        .info-value { font-size: 11.5px; }
+        .notice-text { font-size: 10px; }
     }
 </style>
 {% endblock %}

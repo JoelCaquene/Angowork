@@ -1,17 +1,18 @@
 {% load static %}
-<!DOCTYPE html>
-<html lang="pt-br">
+{% load i18n %} <!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TotalEnergies - Login</title>
+    <title>angowork - {% trans "Login" %}</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
 
     <style>
         :root {
             --primary-blue: #0055a4;
-            --total-red: #ff0000;
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.3);
         }
 
         * { box-sizing: border-box; }
@@ -24,63 +25,75 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            background: radial-gradient(circle at center, #1e3c72 0%, #112244 100%);
-            color: #333;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url("{% static 'background_cad.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
             overflow-x: hidden;
         }
 
-        /* CABEÇALHO AMPLO (Igual ao Cadastro) */
+        /* SELETOR DE IDIOMA NO TOPO */
+        .language-header {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            justify-content: flex-end;
+            padding: 15px;
+            z-index: 10;
+        }
+
+        .lang-select {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(5px);
+            border-radius: 8px;
+            padding: 8px;
+            font-size: 0.85rem;
+            outline: none;
+        }
+        
+        .lang-select option { color: #333; }
+
         .header-logo {
             width: 100%;
-            background: white;
-            padding: 20px 0;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 30px 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-bottom: 1px solid var(--glass-border);
             margin-bottom: 20px;
         }
 
         .header-logo img {
-            height: 70px;
+            height: 110px;
             width: auto;
             object-fit: contain;
+            filter: drop-shadow(0 0 10px rgba(0,0,0,0.2));
         }
 
-        /* ABAS INTERCALADAS */
-        .auth-tabs {
-            display: flex;
-            width: 100%;
-            max-width: 500px;
-            z-index: 2;
-        }
-
-        .tab {
-            flex: 1;
-            padding: 18px;
-            text-align: center;
-            background: rgba(255,255,255,0.15);
-            color: white;
-            text-decoration: none;
+        .platform-text {
+            font-size: 0.85rem;
             font-weight: 700;
-            font-size: 1.1rem;
-            transition: 0.3s;
+            color: #fff;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
-        .tab.active {
-            background: #fff;
-            color: var(--primary-blue);
-            border-radius: 20px 20px 0 0;
-        }
-
-        /* CONTAINER LOGIN (Largura Total) */
         .login-container {
-            background: #fff;
-            padding: 40px 20px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            padding: 40px 25px;
             width: 100%;
             max-width: 500px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
             text-align: center;
+            border: 1px solid var(--glass-border);
+            border-radius: 20px 20px 0 0;
         }
 
         h2 {
@@ -90,7 +103,6 @@
             font-weight: 700;
         }
 
-        /* FORMULÁRIO */
         .form-group {
             margin-bottom: 22px;
             text-align: left;
@@ -101,7 +113,7 @@
             font-weight: 700;
             margin-bottom: 8px;
             display: block;
-            color: #444;
+            color: #222;
             text-transform: uppercase;
         }
 
@@ -109,6 +121,45 @@
             position: relative;
             display: flex;
             align-items: center;
+        }
+
+        .country-select-wrapper {
+            position: absolute;
+            left: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding-right: 8px;
+            border-right: 1px solid #ddd;
+            z-index: 5;
+        }
+
+        .country-select-wrapper select {
+            background: transparent;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--primary-blue);
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 18px 15px 18px 95px;
+            border: 1.5px solid rgba(0,0,0,0.1);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.9);
+            font-size: 1rem;
+            color: #000;
+            transition: 0.3s;
+            outline: none;
+        }
+
+        .password-input {
+            padding-left: 55px !important;
         }
 
         .input-wrapper i.main-icon {
@@ -122,47 +173,16 @@
             position: absolute;
             right: 15px;
             cursor: pointer;
-            color: #999;
-            padding: 10px;
+            color: #666;
             z-index: 10;
         }
 
-        .auth-form input {
-            width: 100%;
-            padding: 18px 45px 18px 55px;
-            border: 1.5px solid #e0e0e0;
-            border-radius: 12px;
-            background: #fdfdfd;
-            font-size: 1rem;
-            transition: 0.3s;
-            outline: none;
-        }
-
-        .auth-form input:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 8px rgba(0,85,164,0.15);
-        }
-
-        /* ERROS */
-        .errorlist {
-            list-style: none;
-            padding: 12px;
-            background: #fff2f0;
-            border: 1px solid #ffccc7;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            color: #ff4d4f;
-            font-size: 0.9rem;
-            text-align: left;
-        }
-
-        /* BOTÃO ENTRAR */
         .submit-button {
             width: 100%;
             padding: 20px;
             border: none;
             border-radius: 12px;
-            background: linear-gradient(135deg, #0055a4 0%, #003366 100%);
+            background: var(--primary-blue);
             color: white;
             font-size: 1.2rem;
             font-weight: 700;
@@ -171,84 +191,138 @@
             justify-content: center;
             align-items: center;
             gap: 15px;
-            margin-top: 10px;
             text-transform: uppercase;
-            box-shadow: 0 8px 15px rgba(0,85,164,0.2);
+            box-shadow: 0 8px 15px rgba(0,85,164,0.3);
+        }
+
+        .auth-tabs-bottom {
+            display: flex;
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 0 0 20px 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border: 1px solid var(--glass-border);
+            border-top: none;
+            margin-bottom: 40px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 22px;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #777;
+            background: rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: var(--primary-blue);
+            border-top: 4px solid var(--primary-blue);
         }
 
         @media (max-width: 500px) {
-            .login-container { border-radius: 0; }
+            .login-container, .auth-tabs-bottom { width: 95%; }
         }
     </style>
 </head>
 <body>
 
-    <header class="header-logo">
-        <img src="{% static 'logo.png' %}" alt="TotalEnergies Logo">
-    </header>
-
-    <div class="auth-tabs">
-        <a href="#" class="tab active">Login</a>
-        <a href="{% url 'cadastro' %}" class="tab">Cadastro</a>
+    <div class="language-header">
+        <form action="{% url 'set_language' %}" method="post" id="lang-form">
+            {% csrf_token %}
+            <input name="next" type="hidden" value="{{ request.path }}">
+            <select name="language" class="lang-select" onchange="this.form.submit()">
+                {% get_current_language as CURRENT_LANG %}
+                <option value="pt" {% if CURRENT_LANG == 'pt' %}selected{% endif %}>Português 🇵🇹</option>
+                <option value="en" {% if CURRENT_LANG == 'en' %}selected{% endif %}>English 🇺🇸</option>
+                <option value="fr" {% if CURRENT_LANG == 'fr' %}selected{% endif %}>Français 🇫🇷</option>
+            </select>
+        </form>
     </div>
 
+    <header class="header-logo">
+        <img src="{% static 'logo.png' %}" alt="angowork">
+        <div class="platform-text">{% trans "Plataforma de Rendimento online" %}</div>
+    </header>
+
     <div class="login-container">
-        <h2>Acesse sua conta</h2>
+        <h2>{% trans "Acesse sua conta" %}</h2>
 
         <form method="post" class="auth-form">
             {% csrf_token %}
 
-            {% if form.non_field_errors %}
-                <div class="errorlist">
-                    {% for error in form.non_field_errors %}
-                        <i class="fa-solid fa-triangle-exclamation"></i> {{ error }}
-                    {% endfor %}
-                </div>
-            {% endif %}
-
             <div class="form-group">
-                <label>Número de Telefone</label>
+                <label>{% trans "Número de Telefone" %}</label>
                 <div class="input-wrapper">
-                    <i class="fa-solid fa-user-large main-icon"></i>
+                    <div class="country-select-wrapper">
+                        <span id="flag-display">🇦🇴</span>
+                        <select id="country-code" name="country_code">
+                            <option value="+244" data-flag="🇦🇴">+244</option>
+                            <option value="+351" data-flag="🇵🇹">+351</option>
+                            <option value="+55" data-flag="🇧🇷">+55</option>
+                            <option value="+1" data-flag="🇺🇸">+1</option>
+                        </select>
+                        <i class="fa-solid fa-caret-down" style="font-size: 0.7rem; color: #999;"></i>
+                    </div>
                     {{ form.username }}
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Sua Senha</label>
+                <label>{% trans "Sua Senha" %}</label>
                 <div class="input-wrapper">
                     <i class="fa-solid fa-key main-icon"></i>
-                    {{ form.password }}
-                    <i class="fa-solid fa-eye toggle-password" id="toggleLoginPass"></i>
+                    <div style="width: 100%;" class="pass-adjust">
+                        {{ form.password }}
+                    </div>
+                    <i class="fa-solid fa-eye-low-vision toggle-password" id="toggleLoginPass"></i>
                 </div>
             </div>
 
             <button type="submit" class="submit-button">
-                <span>Entrar</span>
+                <span>{% trans "Entrar" %}</span>
                 <i class="fa-solid fa-right-to-bracket"></i>
             </button>
         </form>
     </div>
 
+    <div class="auth-tabs-bottom">
+        <a href="#" class="tab-btn active">Login</a>
+        <a href="{% url 'cadastro' %}" class="tab-btn">{% trans "Cadastro" %}</a>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Estilização automática dos campos do Django para bater com o CSS
-            const inputs = document.querySelectorAll('input');
-            inputs.forEach(input => {
-                if(input.name === 'username') input.placeholder = 'Digite seu telefone';
-                if(input.name === 'password') input.placeholder = 'Digite sua senha';
+            const usernameInput = document.querySelector('input[name="username"]');
+            const passwordInput = document.querySelector('input[name="password"]');
+
+            if(usernameInput) usernameInput.placeholder = '9xx xxx xxx';
+            if(passwordInput) {
+                passwordInput.placeholder = '{% trans "Digite sua senha" %}';
+                passwordInput.classList.add('password-input');
+            }
+
+            const countrySelect = document.getElementById('country-code');
+            const flagDisplay = document.getElementById('flag-display');
+
+            countrySelect.addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                flagDisplay.textContent = selectedOption.getAttribute('data-flag');
             });
 
-            // Lógica de Visibilidade da Senha
             const toggleBtn = document.querySelector('#toggleLoginPass');
-            const passInput = document.querySelector('input[name="password"]');
-
-            if (toggleBtn && passInput) {
+            if (toggleBtn && passwordInput) {
                 toggleBtn.addEventListener('click', function() {
-                    const type = passInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                    passInput.setAttribute('type', type);
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+                    this.classList.toggle('fa-eye-low-vision');
                     this.classList.toggle('fa-eye');
-                    this.classList.toggle('fa-eye-slash');
                 });
             }
         });

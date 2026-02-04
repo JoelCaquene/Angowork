@@ -1,238 +1,152 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}TotalEnergies - Afiliação Profissional{% endblock %}
+{% block title %}Centro de Tutoria - Angowork{% endblock %}
 
 {% block content %}
-<div class="container-sobre-full">
+<div class="tutoria-master-container">
     
-    <div class="header-card-wrapper">
-        <div class="header-glass-card">
-            <i class="fas fa-award shine-icon"></i>
-            <h1>ANÚNCIOS DE AFILIAÇÃO</h1>
-            <p>Sua jornada para a liberdade financeira</p>
-        </div>
+    {# HEADER MINIMALISTA #}
+    <div class="tutoria-header-compact">
+        <h1>TUTORIA</h1>
     </div>
 
-    <div class="content-wrapper">
-        <div class="extravagant-card">
-            <div class="card-glow"></div>
-            <div class="card-body">
-                <div class="title-with-icon">
-                    <div class="icon-circle"><i class="fas fa-chart-line"></i></div>
-                    <h3>PLANO DE INVESTIMENTO</h3>
+    <div class="tutoria-body">
+        
+        {# 1. SEÇÃO DE VÍDEOS DE INSTRUÇÃO #}
+        <div class="tutoria-section">
+            <h2 class="section-title"><i class="fas fa-play-circle"></i> Instruções em Vídeo</h2>
+            
+            <div class="video-grid">
+                <div class="video-card tutorial-bg-alt">
+                    <div class="video-wrapper">
+                        <video controls poster="{% static 'images/thumb_deposito.jpg' %}">
+                            <source src="{% static 'videos/tutorial_deposito.mp4' %}" type="video/mp4">
+                            Seu navegador não suporta vídeos.
+                        </video>
+                    </div>
+                    <div class="video-info">
+                        <h3>Depósito e Adquirir Função</h3>
+                        <p>Aprenda o passo a passo para garantir sua vaga na empresa.</p>
+                    </div>
                 </div>
-                <div class="image-container">
-                    <img src="{% static 'images/tabela.jpg' %}" alt="Tabela de Rendimento" class="premium-img">
+
+                <div class="video-card tutorial-bg-alt">
+                    <div class="video-wrapper">
+                        <video controls poster="{% static 'images/thumb_trabalho.jpg' %}">
+                            <source src="{% static 'videos/tutorial_trabalho.mp4' %}" type="video/mp4">
+                        </video>
+                    </div>
+                    <div class="video-info">
+                        <h3>Execução de Trabalho Diário</h3>
+                        <p>Como realizar suas tarefas de marketing e garantir seu ganho.</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="extravagant-card">
-            <div class="card-glow red-glow"></div>
-            <div class="card-body">
-                <div class="title-with-icon">
-                    <div class="icon-circle bg-orange"><i class="fas fa-user-plus"></i></div>
-                    <h3>RECOMPENSA DE CONVITE</h3>
+        {# 2. SEÇÃO DE CARDS DE IMAGENS - APENAS EQUIPA E INVESTIMENTO #}
+        <div class="tutoria-section">
+            <h2 class="section-title"><i class="fas fa-images"></i> Guias e Tabelas</h2>
+            
+            <div class="image-stack">
+                <div class="img-tutorial-card tutorial-bg-alt">
+                    <div class="img-badge">EQUIPA</div>
+                    <img src="{% static 'images/salario_equipe.jpg' %}" alt="Salário Semanal">
+                    <div class="img-caption">Tabela de Salários por Formação de Equipa</div>
                 </div>
-                <div class="image-container">
-                    <img src="{% static 'images/subsidio.jpg' %}" alt="Subsídio de Convite" class="premium-img">
+
+                <div class="img-tutorial-card tutorial-bg-alt">
+                    <div class="img-badge">RENDIMENTOS</div>
+                    <img src="{% static 'images/tabela_rendimento.jpg' %}" alt="Tabela de Investimento">
+                    <div class="img-caption">Tabela Oficial de Cargos e Lucros</div>
                 </div>
             </div>
         </div>
 
-        <div class="extravagant-card">
-            <div class="card-glow blue-glow"></div>
-            <div class="card-body">
-                <div class="title-with-icon">
-                    <div class="icon-circle bg-blue"><i class="fas fa-coins"></i></div>
-                    <h3>RECOMPENSA DE TRABALHO DE AFILIADOS</h3>
+        {# 3. SEÇÃO HISTÓRICO E FUNCIONAMENTO #}
+        <div class="tutoria-section">
+            <h2 class="section-title"><i class="fas fa-landmark"></i> Sobre a Instituição</h2>
+            
+            <div class="history-card tutorial-bg-alt">
+                <div class="history-item">
+                    <div class="history-icon"><i class="fas fa-history"></i></div>
+                    <div class="history-text">
+                        <h3>A Nossa Trajetória</h3>
+                        <p>A Angowork é conhecida no mercado angolano por atuar na gestão de capital humano e prestação de serviços especializados...</p>
+                    </div>
                 </div>
-                <div class="image-container">
-                    <img src="{% static 'images/comissao.jpg' %}" alt="Comissão de Tarefa" class="premium-img">
+
+                <div class="history-item">
+                    <div class="history-icon"><i class="fas fa-briefcase"></i></div>
+                    <div class="history-text">
+                        <h3>Como são feitos os Trabalhos?</h3>
+                        <p>Adquirimos novos serviços de Marketing Digital. Empresas ou particulares pagam para expandir suas marcas na nossa plataforma...</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        {# NOVA SEÇÃO: POLÍTICA DE GERENCIAMENTO DE EQUIPA #}
-        <div class="extravagant-card policy-section">
-            <div class="card-glow gold-glow"></div>
-            <div class="card-body">
-                <div class="title-with-icon">
-                    <div class="icon-circle bg-gold"><i class="fas fa-users-cog"></i></div>
-                    <h3>POLÍTICA DE EQUIPA | TotalEnergies</h3>
-                </div>
-                
-                <div class="policy-intro">
-                    <p>Seja recompensado pelo crescimento da sua rede. Suba de nível, aumente o seu salário mensal e conquiste cargos de liderança administrativa.</p>
-                </div>
-
-                <div class="table-responsive-wrapper">
-                    <table class="career-table">
-                        <thead>
-                            <tr>
-                                <th>Membros Ativos</th>
-                                <th>Função / Cargo</th>
-                                <th>Salário Mensal</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="count">10 Membros</td>
-                                <td class="role">Gestor de Equipa</td>
-                                <td class="salary">25.000 KZ</td>
-                            </tr>
-                            <tr class="responsibilities-row"><td colspan="3">Gerenciamento básico de membros ativos.</td></tr>
-                            
-                            <tr>
-                                <td class="count">15 Membros</td>
-                                <td class="role">Administrador de Grupo</td>
-                                <td class="salary">35.000 KZ</td>
-                            </tr>
-                            <tr class="responsibilities-row"><td colspan="3">Administração direta do grupo de afiliados.</td></tr>
-                            
-                            <tr>
-                                <td class="count">25 Membros</td>
-                                <td class="role">Supervisor de Grupos</td>
-                                <td class="salary">75.000 KZ</td>
-                            </tr>
-                            <tr class="responsibilities-row"><td colspan="3">Supervisão técnica de múltiplos grupos de rede.</td></tr>
-                            
-                            <tr>
-                                <td class="count">30 Membros</td>
-                                <td class="role">Contabilista Sénior</td>
-                                <td class="salary">100.000 KZ</td>
-                            </tr>
-                            <tr class="responsibilities-row"><td colspan="3">Processamento de saques e acesso administrativo.</td></tr>
-                            
-                            <tr>
-                                <td class="count">35 Membros</td>
-                                <td class="role">Diretor Regional</td>
-                                <td class="salary">200.000 KZ</td>
-                            </tr>
-                            <tr class="responsibilities-row"><td colspan="3">Gestão de fundos nacionais e controle de capital.</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 
 <style>
     :root {
-        --primary-blue: #001f3f;
-        --accent-green: #00d1b2;
-        --gold: #ffcc00;
-        --soft-bg: #f8fafc;
+        --primary: #001f3f;
+        --accent: #2563eb;
+        --bg-light: #f8fafc;
+        --card-bg-custom: #eef2f6; 
     }
 
-    body, html { margin: 0; padding: 0; background: #f4f7f6; font-family: 'Segoe UI', sans-serif; overflow-x: hidden; }
-
-    .container-sobre-full { width: 100%; min-height: 100vh; padding-bottom: 30px; }
-
-    .header-card-wrapper {
-        padding: 40px 10px 60px;
-        background: linear-gradient(135deg, #001529 0%, #003366 100%);
-        border-radius: 0 0 30px 30px;
-        text-align: center;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    html, body {
+        overflow-x: hidden;
+        width: 100%;
+        margin: 0; padding: 0;
+        background-color: var(--bg-light);
+        font-family: 'Inter', sans-serif;
     }
 
-    .header-glass-card {
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
+    .tutoria-header-compact {
+        background: var(--primary);
         padding: 20px;
-        border-radius: 20px;
-        border: 1px solid rgba(255,255,255,0.2);
-        display: inline-block;
-        width: 95%;
+        text-align: center;
+        color: white;
+        border-radius: 0 0 20px 20px;
     }
+    .tutoria-header-compact h1 { font-size: 18px; margin: 0; letter-spacing: 2px; font-weight: 800; }
 
-    .header-glass-card h1 { color: #fff; font-size: 1.2rem; margin: 10px 0 5px; letter-spacing: 1px; }
-    .header-glass-card p { color: var(--accent-green); font-weight: 600; margin: 0; font-size: 0.8rem; }
-    .shine-icon { font-size: 2.2rem; color: var(--gold); }
-
-    .content-wrapper { padding: 0 10px; margin-top: -30px; }
-
-    .extravagant-card {
-        background: #fff;
-        border-radius: 18px;
-        padding: 15px 10px;
-        margin-bottom: 20px;
-        position: relative;
-        overflow: hidden;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-    }
-
-    .card-glow {
-        position: absolute; top: -30px; right: -30px;
-        width: 100px; height: 100px;
-        background: var(--accent-green);
-        filter: blur(50px); opacity: 0.1;
-    }
-    .gold-glow { background: var(--gold); }
-
-    .title-with-icon { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
-    .icon-circle {
-        width: 38px; height: 38px;
-        border-radius: 10px;
-        background: #f0fdfa; color: var(--accent-green);
-        display: flex; align-items: center; justify-content: center; font-size: 1rem;
-    }
-    .bg-blue { background: #eef2ff; color: #3b82f6; }
-    .bg-orange { background: #fff7ed; color: #f97316; }
-    .bg-gold { background: #fffbeb; color: #d97706; }
-
-    .extravagant-card h3 { color: var(--primary-blue); font-size: 0.95rem; margin: 0; font-weight: 800; }
-
-    .image-container { width: 100%; border-radius: 10px; overflow: hidden; }
-    .premium-img { width: 100%; height: auto; display: block; }
-
-    /* ESTILO DA NOVA POLÍTICA */
-    .policy-intro {
-        background: #f8fafc;
-        padding: 12px;
-        border-radius: 10px;
-        margin-bottom: 15px;
-        border-left: 4px solid var(--accent-green);
-    }
-    .policy-intro p { margin: 0; font-size: 0.8rem; color: #64748b; line-height: 1.4; }
-
-    .table-responsive-wrapper { width: 100%; overflow-x: auto; }
-    .career-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    .tutoria-body { padding: 20px 15px 100px; }
+    .tutoria-section { margin-bottom: 35px; }
     
-    .career-table thead th {
-        background: #f1f5f9;
-        color: #475569;
-        font-size: 0.7rem;
-        text-transform: uppercase;
-        padding: 10px 5px;
-        text-align: left;
+    .tutorial-bg-alt { background-color: var(--card-bg-custom) !important; color: #000000 !important; }
+    .tutorial-bg-alt h3, .tutorial-bg-alt p, .tutorial-bg-alt div { color: #000000 !important; }
+
+    .section-title {
+        font-size: 16px; font-weight: 700; color: var(--primary);
+        display: flex; align-items: center; gap: 10px; margin-bottom: 15px;
     }
 
-    .career-table tbody td {
-        padding: 12px 5px;
-        font-size: 0.85rem;
-        border-bottom: 1px solid #f1f5f9;
-    }
+    .video-grid { display: flex; flex-direction: column; gap: 20px; }
+    .video-card { border-radius: 15px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .video-wrapper video { width: 100%; display: block; background: #000; }
+    .video-info { padding: 15px; }
+    .video-info h3 { font-size: 15px; margin: 0 0 5px; font-weight: 700; }
+    .video-info p { font-size: 12.5px; margin: 0; }
 
-    .career-table .count { font-weight: 700; color: var(--primary-blue); width: 30%; }
-    .career-table .role { color: #334155; font-weight: 600; }
-    .career-table .salary { color: #16a34a; font-weight: 800; text-align: right; }
+    .image-stack { display: flex; flex-direction: column; gap: 15px; }
+    .img-tutorial-card { position: relative; padding: 10px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .img-tutorial-card img { width: 100%; border-radius: 10px; }
+    .img-badge { position: absolute; top: 20px; left: 20px; background: var(--accent); color: white !important; font-size: 10px; padding: 4px 10px; border-radius: 20px; }
+    .img-caption { text-align: center; font-size: 13px; font-weight: 700; padding-top: 10px; }
 
-    .responsibilities-row td {
-        font-size: 0.75rem;
-        color: #94a3b8;
-        padding-top: 0;
-        padding-bottom: 15px;
-        border-bottom: 2px solid #f8fafc;
-        font-style: italic;
-    }
+    .history-card { border-radius: 20px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    .history-item { display: flex; gap: 15px; margin-bottom: 25px; }
+    .history-icon { min-width: 40px; height: 40px; background: rgba(0,0,0,0.05); color: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
 
     @media (min-width: 768px) {
-        .content-wrapper { max-width: 700px; margin-left: auto; margin-right: auto; }
-        .header-glass-card h1 { font-size: 1.5rem; }
+        .tutoria-body { max-width: 800px; margin: 0 auto; }
+        .video-grid { flex-direction: row; }
+        .video-card { flex: 1; }
     }
 </style>
 {% endblock %}

@@ -32,7 +32,10 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     subsidy_balance = models.DecimalField(max_digits=12, decimal_places=2, default=0.00, verbose_name="Saldo de Subsídios")
     level_active = models.BooleanField(default=False, verbose_name="Nível Ativo")
     roulette_spins = models.IntegerField(default=0, verbose_name="Giros da Roleta")
+    
+    # NOVOS CAMPOS PARA LOGICA DE ESTAGIÁRIO
     is_free_plan_used = models.BooleanField(default=False, verbose_name="Plano Gratuito Ativado")
+    free_days_count = models.IntegerField(default=0, verbose_name="Dias de Estagiário Usados")
 
     USERNAME_FIELD = 'phone_number'
     REQUIRED_FIELDS = []
@@ -84,7 +87,6 @@ class Withdrawal(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     method = models.CharField(max_length=50)
-    # AJUSTE AQUI: Adicionado payment_details para bater com o código da View
     payment_details = models.TextField(blank=True, null=True) 
     withdrawal_details = models.TextField(blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pendente')
@@ -110,6 +112,8 @@ class Task(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     earnings = models.DecimalField(max_digits=12, decimal_places=2)
     completed_at = models.DateTimeField(auto_now_add=True)
+    # Útil para validar o dia da semana e histórico
+    task_day = models.DateField(default=timezone.now)
 
 # --- ROLETA ---
 class Roulette(models.Model):

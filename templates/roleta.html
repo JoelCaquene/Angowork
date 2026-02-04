@@ -5,20 +5,22 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
 <div class="casino-main-wrapper">
+    <a href="{% url 'home' %}" class="btn-voltar-casino">
+        <i class="fas fa-arrow-left"></i> VOLTAR
+    </a>
+
     <div class="casino-bright-bg">
         <div class="shine-effect"></div>
-        <div class="floating-particles"></div>
+        <div class="gold-dust"></div>
     </div>
     
     <div class="container py-4 position-relative main-content">
         <div class="text-center mb-4">
-            <h1 class="premium-title">SORTEIO DA SORTE</h1>
-            <div id="top-win-display" class="top-win-banner" style="display: none;">
-                <i class="fas fa-crown"></i> GANHOU: <span id="win-value-text">0</span> KZ <i class="fas fa-crown"></i>
-            </div>
+            <h1 class="premium-title">SORTEIO DE ACTIVIDADE</h1>
             
-            <div style="display: none;">
-                <span id="roulette-spins">{{ roulette_spins }}</span>
+            <div id="top-win-display" class="top-win-banner" style="display: none;">
+                <div class="win-glow-anim"></div>
+                <i class="fas fa-star"></i> GANHOU: <span id="win-value-text">0</span> KZ <i class="fas fa-star"></i>
             </div>
         </div>
 
@@ -30,25 +32,27 @@
                     <canvas id="wheel-canvas" width="500" height="500"></canvas>
                 </div>
                 <div class="center-spin-anchor" id="spin-trigger">
-                    <div class="center-btn-body"><span>GIRAR</span></div>
+                    <div class="center-btn-body"><span>SORTE</span></div>
                 </div>
             </div>
         </div>
 
+        {# REGISTO DE VENCEDORES COM SCROLL AUTOMÁTICO #}
         <div class="winners-card mt-4">
-            <h4 class="card-title text-center"><i class="fas fa-trophy"></i> Vencedores Recentes</h4>
+            <h4 class="card-title text-center"><i class="fas fa-trophy" style="color: #ffcc00;"></i> REGISTO DE VENCEDORES</h4>
             <div class="ticker-container">
                 <div class="winners-ticker" id="winners-feed">
                     {% for winner in recent_winners %}
                     <div class="winner-item-ticker">
-                        <span class="ticker-user">****{{ winner.user.phone_number|slice:"-4:" }}</span>
+                        <span class="ticker-user">ID: ****{{ winner.user.phone_number|slice:"-4:" }}</span>
                         <span class="ticker-action">ganhou</span>
                         <span class="ticker-value">{{ winner.prize }} KZ</span>
                     </div>
                     {% endfor %}
+                    {# Duplicamos a lista para o efeito de scroll infinito ser suave #}
                     {% for winner in recent_winners %}
                     <div class="winner-item-ticker">
-                        <span class="ticker-user">****{{ winner.user.phone_number|slice:"-4:" }}</span>
+                        <span class="ticker-user">ID: ****{{ winner.user.phone_number|slice:"-4:" }}</span>
                         <span class="ticker-action">ganhou</span>
                         <span class="ticker-value">{{ winner.prize }} KZ</span>
                     </div>
@@ -67,13 +71,10 @@
 
 <style>
     :root {
-        --premium-gold: #FFD700;
-        --bright-yellow: #FFEA00;
-        --dark-text: #4b0000;
-        --win-glow: #ffffff;
+        --casino-gold: #ffd700;
     }
 
-    body, html { margin: 0; padding: 0; overflow-x: hidden; height: 100%; background: var(--bright-yellow); }
+    body, html { margin: 0; padding: 0; overflow-x: hidden; background: #220000; }
     
     .casino-main-wrapper {
         min-height: 100vh;
@@ -81,118 +82,103 @@
         position: relative;
         display: flex;
         flex-direction: column;
-        overflow: hidden;
     }
 
     .casino-bright-bg {
         position: absolute;
         inset: 0;
-        background: radial-gradient(circle at center, #fffb00 0%, #ffcc00 100%);
+        background: radial-gradient(circle at center, #4e0000 0%, #1a0000 100%);
         z-index: 0;
     }
 
     .shine-effect {
         position: absolute;
         width: 200%; height: 200%; top: -50%; left: -50%;
-        background: repeating-conic-gradient(from 0deg, rgba(255,255,255,0.15) 0deg 15deg, transparent 15deg 30deg);
-        animation: rotateShine 20s linear infinite;
+        background: repeating-conic-gradient(from 0deg, rgba(255,215,0,0.05) 0deg 15deg, transparent 15deg 30deg);
+        animation: rotateShine 30s linear infinite;
     }
-
     @keyframes rotateShine { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-    .main-content { z-index: 1; flex: 1; }
+    .btn-voltar-casino {
+        position: absolute; top: 20px; left: 15px; z-index: 200;
+        background: rgba(255,255,255,0.1); color: #fff;
+        padding: 8px 15px; border-radius: 30px; border: 1px solid var(--casino-gold);
+        text-decoration: none; font-size: 11px; font-weight: bold;
+    }
 
     .premium-title { 
-        font-weight: 900; font-size: 2.5rem; color: var(--dark-text);
-        text-shadow: 2px 2px 0px #fff; margin-bottom: 10px;
+        font-weight: 900; font-size: 1.6rem; color: var(--casino-gold);
+        text-shadow: 0 0 15px rgba(255,215,0,0.5); margin-top: 45px;
+        text-transform: uppercase;
     }
 
     .top-win-banner {
-        background: #4b0000; color: #fff; display: inline-block; padding: 10px 30px;
-        border-radius: 50px; font-weight: bold; font-size: 1.5rem;
-        box-shadow: 0 0 20px rgba(0,0,0,0.3);
-        animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        background: linear-gradient(180deg, #ffd700, #b8860b); color: #000;
+        display: inline-block; padding: 12px 30px;
+        border-radius: 10px; font-weight: 900; font-size: 1.4rem;
+        box-shadow: 0 0 30px #fff; margin-top: 10px; z-index: 10;
     }
 
-    @keyframes popIn { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-
-    .wheel-outer-container { position: relative; width: 90vw; max-width: 360px; margin: 20px auto; }
-
+    .wheel-outer-container { position: relative; width: 85vw; max-width: 340px; margin: 20px auto; }
+    
     .wheel-pointer {
-        position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
-        width: 40px; height: 50px; background: #ff0000; z-index: 100; border: 3px solid white;
+        position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+        width: 35px; height: 45px; background: #fff; z-index: 100;
         clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
-        filter: drop-shadow(0 5px 5px rgba(0,0,0,0.3));
     }
 
     .wheel-box {
         position: relative; width: 100%; aspect-ratio: 1/1;
-        background: #fff; border-radius: 50%; border: 10px solid #4b0000;
-        transition: box-shadow 0.3s ease;
+        background: #000; border-radius: 50%; border: 8px solid var(--casino-gold);
     }
 
     .wheel-box.winner-glow {
-        box-shadow: 0 0 60px 20px #fff, 0 0 100px 40px rgba(255,255,255,0.4);
-        border-color: #ffd700;
+        box-shadow: 0 0 60px 20px #fff;
+        transform: scale(1.02);
     }
 
-    .canvas-wrapper { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; }
-    #wheel-canvas { width: 100%; height: 100%; transition: transform 6s cubic-bezier(0.15, 0, 0.1, 1); }
+    #wheel-canvas { width: 100%; height: 100%; transition: transform 5.5s cubic-bezier(0.15, 0, 0.1, 1); }
 
     .center-spin-anchor {
         position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-        width: 80px; height: 80px; background: #4b0000; border-radius: 50%; z-index: 110;
-        cursor: pointer; padding: 5px;
+        width: 65px; height: 65px; background: var(--casino-gold); border-radius: 50%; z-index: 110;
+        cursor: pointer;
     }
 
     .center-btn-body {
-        width: 100%; height: 100%; background: #fff; border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        color: #4b0000; font-weight: 900; font-size: 0.9rem; border: 2px solid #4b0000;
+        width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;
+        color: #000; font-weight: 900; font-size: 0.8rem;
     }
 
-    /* SISTEMA DE VENCEDORES EM MOVIMENTO (TICKER) */
+    /* ESTILO DO REGISTO DE VENCEDORES (TICKER) */
     .winners-card { 
-        background: rgba(255,255,255,0.85); 
-        border: 2px solid #4b0000; 
-        border-radius: 20px; 
-        padding: 15px;
-        max-width: 400px;
-        margin: auto;
+        background: rgba(0,0,0,0.7); 
+        border: 1px solid var(--casino-gold); 
+        border-radius: 15px; padding: 12px; max-width: 380px; margin: auto;
     }
-    .card-title {
-        color: var(--dark-text); /* COR ALTERADA PARA PRETO/ESCURO AQUI */
-        font-weight: bold;
-        margin-bottom: 10px;
-    }
-    .ticker-container { 
-        height: 120px; 
-        overflow: hidden; 
-        position: relative;
-    }
+    .card-title { color: #fff; font-size: 13px; font-weight: bold; margin-bottom: 8px; }
+    
+    .ticker-container { height: 110px; overflow: hidden; position: relative; }
+    
     .winners-ticker {
-        display: flex;
-        flex-direction: column;
-        animation: scrollUp 15s linear infinite; 
+        display: flex; flex-direction: column;
+        animation: scrollUp 10s linear infinite;
     }
-    .winners-ticker:hover { animation-play-state: paused; } 
-
+    
     .winner-item-ticker { 
-        padding: 10px; 
-        border-bottom: 1px solid rgba(75,0,0,0.1); 
-        display: flex; 
-        justify-content: space-between; 
-        color: #333;
-        font-size: 0.95rem;
+        padding: 8px; border-bottom: 1px solid rgba(255,215,0,0.1); 
+        display: flex; justify-content: space-between; color: #fff; font-size: 0.85rem;
     }
-    .ticker-value { color: #d40000; font-weight: bold; }
+    
+    .ticker-value { color: var(--casino-gold); font-weight: bold; }
+    .ticker-action { color: #aaa; font-style: italic; font-size: 0.75rem; }
 
     @keyframes scrollUp {
         0% { transform: translateY(0); }
-        100% { transform: translateY(-50%); } 
+        100% { transform: translateY(-50%); }
     }
 
-    .led { position: absolute; width: 8px; height: 8px; background: #fff; border-radius: 50%; left: 50%; top: 1%; transform-origin: 50% 2200%; box-shadow: 0 0 5px #fff; }
+    .led { position: absolute; width: 6px; height: 6px; background: #fff; border-radius: 50%; left: 50%; top: 2%; transform-origin: 50% 2000%; }
 </style>
 
 <script>
@@ -200,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const canvas = document.getElementById('wheel-canvas');
     const ctx = canvas.getContext('2d');
     const spinTrigger = document.getElementById('spin-trigger');
-    const spinsDisplay = document.getElementById('roulette-spins');
     const sndSpin = document.getElementById('snd-spin');
     const sndWin = document.getElementById('snd-win');
     const wheelBox = document.getElementById('main-wheel-box');
@@ -208,9 +193,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const winValueText = document.getElementById('win-value-text');
 
     let prizes = {{ prizes_list|safe }};
-    if (!prizes || prizes.length === 0) prizes = ["0", "500", "1000", "2500", "5000", "10000"];
-
-    const segmentColors = ["#FFD1DC", "#B2E2F2", "#C1E1C1", "#FDFD96", "#E6E6FA", "#FFCC99", "#D1FFBD", "#F4978E"];
+    const icons = ["💰", "⭐", "💎", "👑", "🔥", "✨", "🍀", "🎁"];
+    const segmentColors = ["#b71c1c", "#1a1a1a", "#b71c1c", "#1a1a1a", "#b71c1c", "#1a1a1a", "#b71c1c", "#1a1a1a"];
     const segments = prizes.length;
     const arc = (2 * Math.PI) / segments;
     let currentRotation = 0;
@@ -224,19 +208,20 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.beginPath();
             ctx.moveTo(250, 250);
             ctx.arc(250, 250, 245, angle, angle + arc);
-            ctx.lineTo(250, 250);
             ctx.fill();
-            ctx.strokeStyle = "rgba(0,0,0,0.1)";
-            ctx.lineWidth = 1;
+            ctx.strokeStyle = "#ffd700";
+            ctx.lineWidth = 2;
             ctx.stroke();
 
             ctx.save();
             ctx.translate(250, 250);
             ctx.rotate(angle + arc / 2);
             ctx.textAlign = "right";
-            ctx.fillStyle = "#4b0000";
-            ctx.font = "bold 24px Arial";
-            ctx.fillText(prizes[i], 220, 10);
+            ctx.fillStyle = "#fff";
+            ctx.font = "900 22px Arial";
+            ctx.fillText(prizes[i], 210, 8);
+            ctx.font = "18px Arial";
+            ctx.fillText(icons[i % icons.length], 130, 8);
             ctx.restore();
         }
     }
@@ -256,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if(data.success) {
                 const prizeIndex = prizes.indexOf(data.prize.toString());
-                const extraRounds = 360 * 8;
+                const extraRounds = 360 * 10;
                 const segmentDeg = 360 / segments;
                 const stopAngle = extraRounds + (360 - (prizeIndex * segmentDeg)) - (segmentDeg / 2) - 90;
 
@@ -270,8 +255,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     winValueText.innerText = data.prize;
                     topWinDisplay.style.display = 'inline-block';
 
-                    setTimeout(() => { location.reload(); }, 3500);
-                }, 6200);
+                    // FIXA O RESULTADO POR 5 SEGUNDOS PARA PRINT
+                    setTimeout(() => { location.reload(); }, 5000);
+                }, 5800);
             } else {
                 alert(data.message);
                 isSpinning = false;
@@ -281,10 +267,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function createLeds() {
         const container = document.getElementById('led-container');
-        for (let i = 0; i < 24; i++) {
+        for (let i = 0; i < 30; i++) {
             const led = document.createElement('div');
             led.className = 'led';
-            led.style.transform = `rotate(${i * 15}deg) translateY(-235px)`;
+            led.style.transform = `rotate(${i * 12}deg) translateY(-242px)`;
             container.appendChild(led);
         }
     }

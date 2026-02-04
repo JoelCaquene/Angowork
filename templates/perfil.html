@@ -1,328 +1,253 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Meu Perfil{% endblock %}
+{% block title %}Editar IBAN - Angowork{% endblock %}
 
 {% block content %}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
-<div class="profile-page-wrapper">
-    
-    {# HEADER #}
-    <div class="profile-top-bar">
-        <a href="{% url 'menu' %}" class="back-link">
-            <i class="fas fa-arrow-left"></i>
-        </a>
-        <h1 class="page-title">Configurações de Perfil</h1>
-        <div style="width: 24px;"></div>
-    </div>
-
-    {# ALERTAS #}
-    {% if messages %}
-        <div class="messages-container">
-            {% for message in messages %}
-                <div class="toast-alert alert-{{ message.tags }}">
-                    <i class="fas fa-info-circle"></i> {{ message }}
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    {# CARTÃO MULTICAIXA - COR ESTILO BANCO SOL #}
-    <div class="multicaixa-container">
-        <div class="mc-card">
-            <div class="mc-header">
-                <span class="mc-brand">MULTICAIXA</span>
-                <div class="mc-chip"></div>
-            </div>
-            
-            <div class="mc-body">
-                <div class="mc-label">NÚMERO IBAN</div>
-                <div class="mc-iban">
-                    {% if bank_info.IBAN %}{{ bank_info.IBAN }}{% else %}AO06 0000 0000 0000 0000 0000 0{% endif %}
-                </div>
-            </div>
-
-            <div class="mc-footer">
-                <div class="mc-holder">
-                    <span class="mc-label">TITULAR DA CONTA</span>
-                    <div class="mc-name">{% if bank_info.account_holder_name %}{{ bank_info.account_holder_name|upper }}{% else %}NÃO DEFINIDO{% endif %}</div>
-                </div>
-                <div class="mc-bank-name">
-                    {% if bank_info.bank_name %}{{ bank_info.bank_name|upper }}{% else %}BANCO{% endif %}
-                </div>
-            </div>
-            <div class="mc-decoration"></div>
-        </div>
-    </div>
-
-    {# MENU E CONTEÚDO #}
-    <div class="profile-content-area">
-        <nav class="vertical-nav-menu">
-            <button class="nav-item active" onclick="openTab(event, 'bank-tab')">
-                <div class="nav-icon bg-blue"><i class="fas fa-university"></i></div>
-                <div class="nav-text">
-                    <span class="nav-title">Vincular Banco</span>
-                    <span class="nav-sub">Guardar informações</span>
-                </div>
-                <i class="fas fa-chevron-right arrow"></i>
-            </button>
-
-            <button class="nav-item" onclick="openTab(event, 'history-tab')">
-                <div class="nav-icon bg-gold"><i class="fas fa-history"></i></div>
-                <div class="nav-text">
-                    <span class="nav-title">Histórico</span>
-                    <span class="nav-sub">Registros de saques</span>
-                </div>
-                <i class="fas fa-chevron-right arrow"></i>
-            </button>
-
-            <button class="nav-item" onclick="openTab(event, 'password-tab')">
-                <div class="nav-icon bg-purple"><i class="fas fa-user-lock"></i></div>
-                <div class="nav-text">
-                    <span class="nav-title">Segurança</span>
-                    <span class="nav-sub">Alterar minha senha</span>
-                </div>
-                <i class="fas fa-chevron-right arrow"></i>
-            </button>
-        </nav>
-
-        <div class="profile-tab-content">
-            {# ABA: FORMULÁRIO BANCO #}
-            <div id="bank-tab" class="tab-view active">
-                <div class="section-card">
-                    <form method="post" class="styled-form">
-                        {% csrf_token %}
-                        <div class="input-group">
-                            <label>Nome Completo do Titular</label>
-                            {{ form.account_holder_name }}
-                        </div>
-                        <div class="input-group">
-                            <label>Nome do Banco</label>
-                            {{ form.bank_name }}
-                        </div>
-                        <div class="input-group">
-                            <label>Número do IBAN</label>
-                            {{ form.IBAN }}
-                        </div>
-                        <button type="submit" name="update_bank" class="main-action-btn">ATUALIZAR MULTICAIXA</button>
-                    </form>
-                </div>
-            </div>
-
-            {# ABA: HISTÓRICO - MODERNIZADA #}
-            <div id="history-tab" class="tab-view">
-                <div class="history-list">
-                    {% for record in withdrawal_records %}
-                    <div class="history-card status-{{ record.status|lower }}">
-                        <div class="h-info">
-                            <span class="h-amount">{{ record.amount }} KZ</span>
-                            <span class="h-date">{{ record.created_at|date:"d M, H:i" }}</span>
-                        </div>
-                        <span class="h-status-badge">{{ record.status|upper }}</span>
-                    </div>
-                    {% empty %}
-                    <p class="empty-msg">Nenhum saque registrado.</p>
-                    {% endfor %}
-                </div>
-            </div>
-
-            {# ABA: SENHA #}
-            <div id="password-tab" class="tab-view">
-                <div class="section-card">
-                    <form method="post" class="styled-form">
-                        {% csrf_token %}
-                        <div class="input-group">
-                            <label>Senha Atual</label>
-                            {{ password_form.old_password }}
-                        </div>
-                        <div class="input-group">
-                            <label>Nova Senha</label>
-                            {{ password_form.new_password1 }}
-                        </div>
-                        <div class="input-group">
-                            <label>Confirmar Nova Senha</label>
-                            {{ password_form.new_password2 }}
-                        </div>
-                        <button type="submit" name="change_password" class="main-action-btn btn-dark">ALTERAR SENHA AGORA</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <style>
     :root {
-        --mc-sol-blue: linear-gradient(135deg, #004691 0%, #002a5a 100%);
-        --mc-accent: #f0b429;
-        --bg-body: #f4f7fa;
-        --text-dark: #2d3748;
-        --status-pending: #e53e3e; /* Vermelho */
-        --status-approved: #38a169; /* Verde */
+        --primary-gold: #f1c40f;
+        --dark-card: rgba(10, 15, 25, 0.95);
+        --input-bg: rgba(255, 255, 255, 0.07);
+        --success-green: #2ecc71;
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-    body { 
-        background-color: var(--bg-body); 
-        margin: 0; 
-        font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        overflow-x: hidden;
-    }
-
-    .profile-page-wrapper { 
-        width: 100%; 
-        max-width: 480px; 
-        margin: 0 auto; 
-        min-height: 100vh;
-        background: var(--bg-body);
-    }
-
-    /* BARRA SUPERIOR */
-    .profile-top-bar { 
-        display: flex; 
-        align-items: center; 
-        justify-content: space-between; 
-        padding: 16px; 
-        background: white;
-    }
-    .back-link { color: var(--text-dark); font-size: 1.2rem; text-decoration: none; }
-    .page-title { font-size: 1.1rem; font-weight: 700; margin: 0; color: var(--text-dark); }
-
-    /* CARTÃO MULTICAIXA */
-    .multicaixa-container { padding: 16px; width: 100%; }
-    .mc-card {
+    /* Reset para evitar rolagem horizontal e "balanço" */
+    html, body {
+        margin: 0;
+        padding: 0;
         width: 100%;
-        aspect-ratio: 1.58 / 1;
-        background: var(--mc-sol-blue);
-        border-radius: 16px;
-        padding: 24px;
-        position: relative;
+        overflow-x: hidden; /* Trava rolagem lateral */
+        background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url("{% static 'background_cad.jpg' %}") no-repeat center center fixed;
+        background-size: cover;
+        font-family: 'Poppins', sans-serif;
         color: white;
-        box-shadow: 0 12px 24px rgba(0,42,90,0.3);
+    }
+
+    .profile-container {
+        width: 100%;
+        max-width: 400px; /* Ajuste para ecrãs menores */
+        margin: 0 auto;
+        padding: 15px;
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        overflow: hidden;
+        justify-content: center;
+        box-sizing: border-box;
     }
 
-    .mc-header { display: flex; justify-content: space-between; align-items: flex-start; }
-    .mc-brand { font-weight: 800; font-size: 1.1rem; letter-spacing: 1px; }
-    .mc-chip { 
-        width: 42px; height: 32px; 
-        background: linear-gradient(135deg, #d1d5db, #9ca3af); 
-        border-radius: 6px; 
+    .header-minimal {
+        text-align: center;
+        margin-bottom: 25px;
     }
 
-    .mc-iban { 
-        font-family: 'Courier New', monospace; 
-        font-size: 1.1rem; 
-        font-weight: bold;
-        letter-spacing: 1px; 
-        word-break: break-all;
-        color: #fff;
+    .header-minimal i {
+        font-size: 2.5rem;
+        color: var(--primary-gold);
+        margin-bottom: 8px;
     }
 
-    .mc-label { font-size: 0.6rem; text-transform: uppercase; opacity: 0.8; margin-bottom: 4px; letter-spacing: 0.5px; }
-    .mc-name { font-size: 0.9rem; font-weight: 600; letter-spacing: 1px; }
-    .mc-bank-name { font-weight: 700; font-size: 0.8rem; border-bottom: 2px solid var(--mc-accent); }
+    /* CARD PRINCIPAL */
+    .iban-card {
+        background: var(--dark-card);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 25px;
+        border-radius: 25px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+        width: 100%;
+        box-sizing: border-box;
+    }
 
-    /* MENU DE NAVEGAÇÃO */
-    .vertical-nav-menu { padding: 8px 16px; }
-    .nav-item {
-        width: 100%; 
-        display: flex; 
-        align-items: center; 
-        padding: 14px;
-        background: white; 
-        border: 1px solid #edf2f7; 
-        border-radius: 12px; 
-        margin-bottom: 10px;
+    /* ESTILO DO RESUMO (DADOS SALVOS) */
+    .data-summary {
+        text-align: center;
+    }
+
+    .summary-item {
+        margin-bottom: 15px;
+        padding: 10px;
+        background: rgba(255,255,255,0.03);
+        border-radius: 12px;
+    }
+
+    .summary-label {
+        display: block;
+        font-size: 0.65rem;
+        color: var(--primary-gold);
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+
+    .summary-value {
+        font-size: 0.95rem;
+        font-weight: 600;
+        word-break: break-all; /* Evita que IBAN longo quebre o layout */
+    }
+
+    /* FORMULÁRIO (ESCONDIDO POR PADRÃO VIA JS SE HOUVER DADOS) */
+    #ibanForm {
+        display: none; 
+    }
+
+    .form-group { margin-bottom: 18px; }
+    .form-group label {
+        display: block;
+        font-size: 0.7rem;
+        color: var(--primary-gold);
+        margin-bottom: 6px;
+        text-transform: uppercase;
+    }
+
+    .input-wrapper { position: relative; display: flex; align-items: center; }
+    .input-wrapper i { position: absolute; left: 15px; color: #777; }
+
+    .input-wrapper input {
+        width: 100%;
+        padding: 14px 14px 14px 45px;
+        background: var(--input-bg);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        color: white;
+        font-size: 0.9rem;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    /* BOTÕES */
+    .btn-action {
+        width: 100%;
+        padding: 15px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 700;
         cursor: pointer;
-        transition: 0.2s;
-    }
-    .nav-item.active { border-color: #004691; background: #ebf4ff; }
-    .nav-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; margin-right: 12px; flex-shrink: 0; }
-    .nav-text { flex-grow: 1; text-align: left; }
-    .nav-title { display: block; font-weight: 700; font-size: 0.9rem; color: var(--text-dark); }
-    .nav-sub { font-size: 0.7rem; color: #718096; }
-    .arrow { font-size: 0.8rem; color: #cbd5e0; }
-
-    /* CONTEÚDO DAS ABAS */
-    .profile-tab-content { padding: 0 16px 40px 16px; }
-    .tab-view { display: none; width: 100%; }
-    .tab-view.active { display: block; animation: fadeIn 0.3s ease; }
-
-    .section-card { background: white; padding: 20px; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
-
-    /* FORMULÁRIO */
-    .input-group { margin-bottom: 16px; }
-    .input-group label { display: block; font-size: 0.75rem; font-weight: 700; color: #4a5568; margin-bottom: 6px; }
-    .input-group input {
-        width: 100%; padding: 12px; border-radius: 10px; border: 1.5px solid #e2e8f0;
-        font-size: 1rem; color: var(--text-dark); outline: none;
-    }
-    .input-group input:focus { border-color: #004691; }
-
-    .main-action-btn {
-        width: 100%; padding: 16px; border-radius: 12px; border: none;
-        background: #004691; color: white; font-weight: 700; font-size: 0.9rem;
-        cursor: pointer; margin-top: 10px;
-    }
-    .btn-dark { background: #2d3748; }
-
-    /* HISTÓRICO ATUALIZADO */
-    .history-card { 
-        background: white; padding: 16px; border-radius: 12px; margin-bottom: 10px;
-        display: flex; justify-content: space-between; align-items: center;
-        border-left: 6px solid #cbd5e0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-    }
-    
-    /* Lógica de cores para Pendente */
-    .status-pendente { border-left-color: var(--status-pending); }
-    .status-pendente .h-status-badge { color: var(--status-pending); background: #fff5f5; }
-
-    /* Lógica de cores para Aprovado */
-    .status-aprovado { border-left-color: var(--status-approved); }
-    .status-aprovado .h-status-badge { color: var(--status-approved); background: #f0fff4; }
-
-    .h-amount { display: block; font-weight: 700; font-size: 1.1rem; color: var(--text-dark); }
-    .h-date { font-size: 0.75rem; color: #718096; }
-    .h-status-badge { 
-        font-size: 0.7rem; font-weight: 800; padding: 6px 12px; 
-        border-radius: 8px; text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: 0.3s;
+        text-transform: uppercase;
+        font-size: 0.85rem;
     }
 
-    .bg-blue { background: #3182ce; }
-    .bg-gold { background: #d69e2e; }
-    .bg-purple { background: #805ad5; }
+    .save-btn { background: var(--success-green); color: white; margin-top: 10px; }
+    .edit-btn { background: rgba(255,255,255,0.1); color: white; border: 1px solid rgba(255,255,255,0.2); margin-top: 15px; }
 
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(5px); }
-        to { opacity: 1; transform: translateY(0); }
+    .btn-return { margin-top: 20px; text-align: center; }
+    .btn-return a { color: #aaa; text-decoration: none; font-size: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+    /* MENSAGEM SUCESSO */
+    .alert-success {
+        background: rgba(46, 204, 113, 0.2);
+        border: 1px solid var(--success-green);
+        color: var(--success-green);
+        padding: 12px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        text-align: center;
+        margin-bottom: 15px;
     }
-
-    .empty-msg { text-align: center; color: #a0aec0; font-size: 0.9rem; margin-top: 20px; }
 </style>
 
+<div class="profile-container">
+    <div class="header-minimal">
+        <i class="fas fa-shield-halved"></i>
+        <h1>Dados Bancários</h1>
+        <p>Segurança Angowork</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert-success"><i class="fas fa-check-circle"></i> {{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="iban-card">
+        <div id="dataSummary" class="data-summary">
+            <div class="summary-item">
+                <span class="summary-label">Titular</span>
+                <span class="summary-value">{% if bank_info.account_holder_name %}{{ bank_info.account_holder_name }}{% else %}---{% endif %}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Banco</span>
+                <span class="summary-value">{% if bank_info.bank_name %}{{ bank_info.bank_name }}{% else %}---{% endif %}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">IBAN</span>
+                <span class="summary-value">{% if bank_info.IBAN %}{{ bank_info.IBAN }}{% else %}---{% endif %}</span>
+            </div>
+            
+            <button class="btn-action edit-btn" onclick="toggleForm()">
+                <i class="fas fa-edit"></i> Editar Coordenadas
+            </button>
+        </div>
+
+        <form method="post" id="ibanForm">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Nome do Titular</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-user-circle"></i>
+                    {{ form.account_holder_name }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Instituição</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-university"></i>
+                    {{ form.bank_name }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Número IBAN</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-fingerprint"></i>
+                    {{ form.IBAN }}
+                </div>
+            </div>
+
+            <button type="submit" name="update_bank" class="btn-action save-btn">
+                <i class="fas fa-check-double"></i> Confirmar Alteração
+            </button>
+            
+            <button type="button" class="btn-action edit-btn" style="border:none; background:none; font-size: 0.7rem;" onclick="toggleForm()">
+                Cancelar
+            </button>
+        </form>
+    </div>
+
+    <div class="btn-return">
+        <a href="{% url 'menu' %}">
+            <i class="fas fa-arrow-left"></i> Voltar ao Painel
+        </a>
+    </div>
+</div>
+
 <script>
-    function openTab(evt, tabName) {
-        let i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tab-view");
-        for (i = 0; i < tabcontent.length; i++) {
-            tabcontent[i].style.display = "none";
-            tabcontent[i].classList.remove("active");
+    function toggleForm() {
+        const summary = document.getElementById('dataSummary');
+        const form = document.getElementById('ibanForm');
+        
+        if (form.style.display === 'none' || form.style.display === '') {
+            form.style.display = 'block';
+            summary.style.display = 'none';
+        } else {
+            form.style.display = 'none';
+            summary.style.display = 'block';
         }
-        tablinks = document.getElementsByClassName("nav-item");
-        for (i = 0; i < tablinks.length; i++) {
-            tablinks[i].classList.remove("active");
-        }
-        const targetTab = document.getElementById(tabName);
-        targetTab.style.display = "block";
-        setTimeout(() => targetTab.classList.add("active"), 10);
-        evt.currentTarget.classList.add("active");
     }
+
+    // Garante que o layout não balance ao carregar
+    window.onload = function() {
+        const hasIban = "{{ bank_info.IBAN }}";
+        if (!hasIban || hasIban === "None") {
+            toggleForm(); // Se não tem dados, já abre o formulário
+        }
+    };
 </script>
 {% endblock %}

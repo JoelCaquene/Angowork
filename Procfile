@@ -1,1 +1,1 @@
-web: gunicorn totalenergies.wsgi
+web: gunicorn angowork.wsgi

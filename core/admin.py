@@ -9,10 +9,13 @@ from .models import (
 
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('phone_number', 'available_balance', 'subsidy_balance', 'is_staff', 'is_active', 'date_joined', 'roulette_spins')
+    # ADICIONADO: 'free_days_count' para você controlar quantos dias o estagiário já usou
+    list_display = ('phone_number', 'available_balance', 'free_days_count', 'is_staff', 'is_active', 'date_joined')
     search_fields = ('phone_number', 'invite_code')
     list_filter = ('is_staff', 'is_active', 'level_active')
     ordering = ('-date_joined',)
+    # Permite editar o contador de dias grátis direto na lista se precisar dar bônus
+    list_editable = ('free_days_count',)
 
 # --- CONFIGURAÇÕES DE DEPÓSITO ---
 
@@ -52,17 +55,15 @@ class DepositAdmin(admin.ModelAdmin):
         return "Nenhum Comprovativo Carregado"
     current_proof_display.short_description = 'Foto do Comprovativo'
 
-# --- CONFIGURAÇÕES DE SAQUE (ATUALIZADO COM MÉTODO E DETALHES) ---
+# --- CONFIGURAÇÕES DE SAQUE ---
 
 @admin.register(Withdrawal)
 class WithdrawalAdmin(admin.ModelAdmin):
-    # Mostra o método e detalhes na lista principal
     list_display = ('user', 'amount', 'method', 'status', 'created_at')
     search_fields = ('user__phone_number', 'withdrawal_details')
     list_filter = ('status', 'method', 'created_at')
     list_editable = ('status',)
     
-    # Organiza os campos para facilitar o pagamento por parte do admin
     fieldsets = (
         ('Informações de Solicitação', {
             'fields': ('user', 'amount', 'status')
@@ -97,9 +98,10 @@ class PlatformBankDetailsAdmin(admin.ModelAdmin):
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('user', 'earnings', 'completed_at')
+    # ADICIONADO: 'task_day' para você ver exatamente a data da tarefa no painel
+    list_display = ('user', 'earnings', 'task_day', 'completed_at')
     search_fields = ('user__phone_number',)
-    list_filter = ('completed_at',)
+    list_filter = ('task_day', 'completed_at')
 
 @admin.register(UserLevel)
 class UserLevelAdmin(admin.ModelAdmin):

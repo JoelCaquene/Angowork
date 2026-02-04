@@ -1,7 +1,9 @@
+from django.urls import path, include, reverse_lazy
 from django.urls import path
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
 from . import views
+from .views import MyPasswordChangeView
 
 urlpatterns = [
     # Redirecionamento para a página de login
@@ -26,11 +28,9 @@ urlpatterns = [
     path('perfil/', views.perfil, name='perfil'),
     path('renda/', views.renda, name='renda'),
     
-    # URLs para alteração de senha
-    path('change_password/', auth_views.PasswordChangeView.as_view(
-        template_name='registration/password_change_form.html',
-        success_url='change_password_done/'
-    ), name='change_password'),
+   # URLs para alteração de senha CORRIGIDAS
+path('change_password/', MyPasswordChangeView.as_view(), name='change_password'),
+
     path('change_password_done/', auth_views.PasswordChangeDoneView.as_view(
         template_name='registration/password_change_done.html'
     ), name='change_password_done'),

@@ -12,9 +12,17 @@ from datetime import date, time, datetime
 from django.utils import timezone
 from decimal import Decimal
 
+from django.contrib.auth.views import PasswordChangeView
+from django.urls import reverse_lazy
+
 from .forms import RegisterForm, DepositForm, WithdrawalForm, BankDetailsForm
 from .models import PlatformSettings, CustomUser, Level, UserLevel, BankDetails, Deposit, Withdrawal, Task, PlatformBankDetails, Roulette, RouletteSettings
 
+# --- ADICIONE ESTA CLASSE LOGO ABAIXO DOS IMPORTS ---
+class MyPasswordChangeView(PasswordChangeView):
+    template_name = 'registration/password_change_form.html'
+    success_url = reverse_lazy('change_password_done')
+    
 # --- FUNÇÃO HOME ---
 def home(request):
     if request.user.is_authenticated:
@@ -155,7 +163,7 @@ def approve_deposit(request, deposit_id):
         messages.success(request, f'Depósito de {deposit.amount} aprovado para {deposit.user.phone_number}.')
     return redirect('renda')
 
-# --- SAQUE (CORRIGIDO) ---
+# --- SAQUE ---
 @login_required
 def saque(request):
     MIN_WITHDRAWAL_AMOUNT = 2500
@@ -163,14 +171,22 @@ def saque(request):
     withdrawal_instruction = platform_settings.withdrawal_instruction if platform_settings else ''
     withdrawal_records = Withdrawal.objects.filter(user=request.user).order_by('-created_at')
     
-    today = timezone.localdate(timezone.now())
+    now = timezone.localtime(timezone.now())
+    today = now.date()
+    weekday = now.weekday() 
+
+    is_sunday = (weekday == 6)
+    is_business_hours = (9 <= current_hour < 17) if 'current_hour' in locals() else (9 <= now.hour < 17)
+    is_business_day = (0 <= weekday <= 5)
+    is_time_to_withdraw = is_business_hours and is_business_day and not is_sunday
+
     withdrawals_today_count = Withdrawal.objects.filter(
         user=request.user, 
         created_at__date=today, 
         status__in=['Pendente', 'Aprovado']
     ).count()
     can_withdraw_today = withdrawals_today_count == 0
-    
+
     if request.method == 'POST':
         form = WithdrawalForm(request.POST)
         
@@ -182,18 +198,25 @@ def saque(request):
         usdt_addr = request.POST.get('usdt_address')
         
         if form.is_valid():
-            amount = form.cleaned_data['amount']
+            original_amount = form.cleaned_data['amount']
             
-            if not metodo:
-                messages.error(request, 'Selecione um método de levantamento.')
+            if is_sunday:
+                messages.error(request, 'Hoje é feriado, saque é só amanhã.')
+            elif not is_business_hours:
+                messages.error(request, 'O sistema de saque só funciona das 09:00 às 17:00.')
             elif not can_withdraw_today:
                 messages.error(request, 'Você já realizou um saque hoje. Tente novamente amanhã.')
-            elif amount < MIN_WITHDRAWAL_AMOUNT:
+            elif original_amount < MIN_WITHDRAWAL_AMOUNT:
                 messages.error(request, f'O valor mínimo para levantamento é {MIN_WITHDRAWAL_AMOUNT} Kz.')
-            elif request.user.available_balance < amount:
+            elif request.user.available_balance < original_amount:
                 messages.error(request, 'Saldo insuficiente para esta operação.')
+            elif not metodo:
+                messages.error(request, 'Selecione um método de levantamento.')
             else:
-                detalhes = f"Método: {metodo} | "
+                taxa = original_amount * Decimal('0.15')
+                amount_with_discount = original_amount - taxa
+                
+                detalhes = f"Método: {metodo} | Taxa de 15% descontada: {taxa} KZ | "
                 if metodo == 'BANCO':
                     detalhes += f"Banco: {bank_name}, IBAN: {iban}, Titular: {holder}"
                 elif metodo == 'PIX':
@@ -203,15 +226,16 @@ def saque(request):
 
                 Withdrawal.objects.create(
                     user=request.user, 
-                    amount=amount,
+                    amount=amount_with_discount,
                     method=metodo,
-                    withdrawal_details=detalhes 
+                    withdrawal_details=detalhes,
+                    status='Pendente'
                 )
 
-                request.user.available_balance -= amount
+                request.user.available_balance -= original_amount
                 request.user.save()
                 
-                messages.success(request, f'Pedido de levantamento de {amount} KZ enviado com sucesso!')
+                messages.success(request, f'Pedido enviado! Taxa de 15% descontada ({taxa} KZ). Você receberá {amount_with_discount} KZ.')
                 return redirect('saque')
     else:
         form = WithdrawalForm()
@@ -220,13 +244,14 @@ def saque(request):
         'withdrawal_instruction': withdrawal_instruction,
         'withdrawal_records': withdrawal_records,
         'form': form,
-        'is_time_to_withdraw': True,
+        'is_time_to_withdraw': is_time_to_withdraw,
+        'is_sunday': is_sunday,
         'MIN_WITHDRAWAL_AMOUNT': MIN_WITHDRAWAL_AMOUNT,
         'can_withdraw_today': can_withdraw_today,
     }
     return render(request, 'saque.html', context)
-
-# --- TAREFAS ---
+    
+    # --- TAREFAS (LOGICA ATUALIZADA) ---
 @login_required
 def tarefa(request):
     user = request.user
@@ -235,11 +260,31 @@ def tarefa(request):
     today = timezone.localdate()
     tasks_completed_today = Task.objects.filter(user=user, completed_at__date=today).count()
     
+    # Validação de Domingo para o template
+    is_sunday = (today.weekday() == 6)
+
+    # Lista de empresas enviada diretamente para o template (resolve o erro de TemplateTag)
+    companies = [
+        {'name': 'UNITEL', 'category': 'Telecomunicações', 'icon': 'fa-phone'},
+        {'name': 'SONANGOL', 'category': 'Energia', 'icon': 'fa-gas-pump'},
+        {'name': 'BANCO BAI', 'category': 'Finanças', 'icon': 'fa-building-columns'},
+        {'name': 'TAAG', 'category': 'Aviação', 'icon': 'fa-plane'},
+        {'name': 'ZAP', 'category': 'Entretenimento', 'icon': 'fa-tv'},
+        {'name': 'CANDANDO', 'category': 'Retalho', 'icon': 'fa-cart-shopping'},
+        {'name': 'ENSA', 'category': 'Seguros', 'icon': 'fa-shield-halved'},
+        {'name': 'AFRICEL', 'category': 'Telecomunicações', 'icon': 'fa-tower-cell'},
+        {'name': 'KERO', 'category': 'Supermercado', 'icon': 'fa-basket-shopping'},
+        {'name': 'NOSSA SEGUROS', 'category': 'Seguros', 'icon': 'fa-file-contract'},
+    ]
+    
     context = {
         'is_estagiario': is_estagiario,
         'active_level': active_level,
         'tasks_completed_today': tasks_completed_today,
         'max_tasks': 1,
+        'is_sunday': is_sunday,
+        'free_days_count': user.free_days_count,
+        'companies': companies,
     }
     return render(request, 'tarefa.html', context)
 
@@ -247,8 +292,15 @@ def tarefa(request):
 @require_POST
 def process_task(request):
     user = request.user
-    today = timezone.localdate()
+    now = timezone.localtime(timezone.now())
+    today = now.date()
+    weekday = now.weekday()
 
+    # 1. BLOQUEIO DE DOMINGO
+    if weekday == 6:
+        return JsonResponse({'success': False, 'message': 'Hoje é feriado, volte amanhã.'})
+
+    # 2. LIMITE DIÁRIO
     if Task.objects.filter(user=user, completed_at__date=today).exists():
         return JsonResponse({'success': False, 'message': 'Limite diário de tarefas alcançado.'})
 
@@ -256,16 +308,27 @@ def process_task(request):
         active_user_level = UserLevel.objects.filter(user=user, is_active=True).select_related('level').first()
 
         if active_user_level:
+            # Usuário com Plano Pago
             task_earnings = Decimal(str(active_user_level.level.daily_gain))
         else:
-            task_earnings = Decimal('80.00')
+            # LOGICA DE ESTAGIÁRIO
+            if user.free_days_count >= 2:
+                return JsonResponse({
+                    'success': False, 
+                    'message': 'Seu período de estagiário terminou. Adquira um plano pago para continuar.'
+                })
+            
+            task_earnings = Decimal('450.00') # Ganho de estagiário
+            user.free_days_count += 1
 
-        Task.objects.create(user=user, earnings=task_earnings) 
+        # Salva a tarefa e atualiza saldo
+        Task.objects.create(user=user, earnings=task_earnings, completed_at=now) 
         user.available_balance += task_earnings
         user.save()
 
+        # Comissões de rede (Apenas para planos pagos)
         p1 = user.invited_by
-        if active_user_level and p1: # Verificação para remover comissão do Plano 0
+        if active_user_level and p1: 
             subsidy_a = task_earnings * Decimal('0.20')
             p1.available_balance += subsidy_a
             p1.subsidy_balance += subsidy_a
@@ -287,13 +350,12 @@ def process_task(request):
 
         return JsonResponse({
             'success': True, 
-            'message': f'Tarefa concluída! {task_earnings} KZ adicionados ao saldo.'
+            'message': f'Tarefa concluída! {task_earnings} KZ adicionados ao seu saldo.'
         })
 
     except Exception as e:
         return JsonResponse({'success': False, 'message': f'Erro: {str(e)}'})
-
-# --- NÍVEIS VIP ---
+        
 @login_required
 def nivel(request):
     if request.method == 'POST':
@@ -338,9 +400,10 @@ def nivel(request):
             messages.error(request, 'Saldo insuficiente para ativar este nível.')
         return redirect('nivel')
     
+    active_user_levels = UserLevel.objects.filter(user=request.user, is_active=True).values_list('level__id', flat=True)
     context = {
         'levels': Level.objects.all().order_by('deposit_value'),
-        'user_levels': UserLevel.objects.filter(user=request.user, is_active=True).values_list('level__id', flat=True),
+        'user_levels': active_user_levels,
     }
     return render(request, 'nivel.html', context)
 
@@ -433,19 +496,10 @@ def perfil(request):
                 form.save()
                 messages.success(request, 'Dados bancários atualizados com sucesso!')
                 return redirect('perfil')
-        
-        elif 'change_password' in request.POST:
-            password_form = PasswordChangeForm(request.user, request.POST)
-            if password_form.is_valid():
-                user = password_form.save()
-                update_session_auth_hash(request, user)
-                messages.success(request, 'Senha alterada com sucesso!')
-                return redirect('perfil')
-
+    
     context = {
         'form': BankDetailsForm(instance=bank_details),
         'bank_info': bank_details,
-        'password_form': PasswordChangeForm(request.user),
         'user_levels': UserLevel.objects.filter(user=request.user, is_active=True),
         'withdrawal_records': withdrawal_records,
     }

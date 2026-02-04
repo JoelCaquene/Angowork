@@ -1,244 +1,239 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}TotalEnergies - Smart Grid Terminal{% endblock %}
+{% block title %}ANGOWORK - Centro de Avaliações{% endblock %}
 
 {% block content %}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
-<div class="energy-terminal-wrapper">
-    <div class="energy-terminal">
+<div class="work-wrapper" style="background: url('{% static 'images/bg-work.jpg' %}') no-repeat center center fixed; background-size: cover;">
+    <div class="glass-overlay"></div>
+    
+    <div class="work-container">
         
-        {# HEADER TOTALENERGIES #}
-        <div class="energy-header">
-            <div class="brand-section">
-                <div class="total-logo">
-                    <i class="fa-solid fa-bolt-lightning"></i>
-                </div>
+        {# NOVO HEADER ESTILIZADO #}
+        <div class="header-premium">
+            <div class="brand-group">
+                <div class="logo-circle">AW</div>
                 <div class="brand-text">
-                    <span class="brand-name">TotalEnergies</span>
-                    <span class="terminal-id">SMART GRID V2.4</span>
+                    <h1>ANGOWORK</h1>
+                    <p><i class="fa-solid fa-circle-check"></i> Parceiro Oficial de Marcas</p>
                 </div>
             </div>
-            <div class="system-status">
-                <span class="status-label">
-                    {% if is_estagiario %}PLANO ESTAGIÁRIO{% else %}REDE ESTÁVEL{% endif %}
-                </span>
-                <div class="status-bar">
-                    <div class="status-fill"></div>
-                </div>
+            <div class="badge-status {% if is_estagiario %}is-free{% endif %}">
+                {% if is_estagiario %}ESTAGIÁRIO{% else %}VIP GOLD{% endif %}
             </div>
         </div>
 
-        {# REMOVIDO O BLOQUEIO: Agora permite Estagiários ou VIPs #}
-        
-        {# SELECÇÃO DE TAREFA (TABS) #}
-        <div class="task-tabs">
-            <div class="tab-item active" id="tab-buy-control">
-                <i class="fa-solid fa-solar-panel"></i>
-                <span>1. COMPRA</span>
-            </div>
-            <div class="tab-item disabled" id="tab-sell-control">
-                <i class="fa-solid fa-hand-holding-dollar"></i>
-                <span>2. VENDA</span>
-            </div>
-        </div>
-
-        {# AREA PRINCIPAL #}
-        <div class="main-display">
+        {# CONTEÚDO PRINCIPAL #}
+        <div class="content-body">
             
-            <div id="section-buy" class="content-section">
-                <h3 class="section-title">Componentes Disponíveis</h3>
-                
-                {% if is_estagiario %}
-                <div style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; font-size: 12px; margin-bottom: 15px; border: 1px solid #ffeeba;">
-                    <i class="fa-solid fa-circle-info"></i> Você está no <strong>Plano Gratuito</strong>. Ganho de hoje: <strong>80 KZ</strong>.
+            {# SEÇÃO 1: SELEÇÃO DE EMPRESAS (SLIDE) #}
+            <div id="section-select" class="view-section">
+                <div class="task-info-card">
+                    <p>Escolha uma empresa para avaliar hoje e receba seu bônus.</p>
+                    {% if is_estagiario %}
+                    <div class="mini-alert">
+                        Ganho disponível: <strong>450 KZ</strong>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
 
-                <div class="energy-list">
-                    <div class="energy-item">
-                        <div class="item-icon"><i class="fa-solid fa-solar-panel"></i></div>
-                        <div class="item-info">
-                            <strong>Kit Solar Fotovoltaico</strong>
-                            <span>Eficiência: 98.5%</span>
+                <div class="company-slider-container">
+                    {% if is_sunday %}
+                        <div class="sunday-card">
+                            <i class="fa-solid fa-mug-hot"></i>
+                            <h3>Domingo de Descanso</h3>
+                            <p>Nossos servidores estão em manutenção. Voltamos segunda-feira!</p>
                         </div>
-                        <button class="buy-action-btn">Comprar</button>
-                    </div>
-                    <div class="energy-item">
-                        <div class="item-icon"><i class="fa-solid fa-wind"></i></div>
-                        <div class="item-info">
-                            <strong>Turbina Eólica Onshore</strong>
-                            <span>Capacidade: 2.5 MW</span>
+                    {% else %}
+                        <div id="company-wrapper" class="company-wrapper">
+                            {% for company in companies %}
+                            <div class="company-card-premium" data-index="{{ forloop.counter0 }}" style="display: none;">
+                                <div class="comp-icon-box">
+                                    <i class="fa-solid {{ company.icon }}"></i>
+                                </div>
+                                <div class="comp-details">
+                                    <h3>{{ company.name }}</h3>
+                                    <span class="category">{{ company.category }}</span>
+                                    <p class="description">Empresa líder no setor, com mais de 10 anos de excelência em Angola.</p>
+                                </div>
+                                <button class="btn-start-eval">Avaliar Agora</button>
+                            </div>
+                            {% endfor %}
                         </div>
-                        <button class="buy-action-btn">Comprar</button>
-                    </div>
-                    <div class="energy-item">
-                        <div class="item-icon"><i class="fa-solid fa-car-battery"></i></div>
-                        <div class="item-info">
-                            <strong>Unidade de Armazenamento</strong>
-                            <span>Lithium-Ion Grid-Scale</span>
+
+                        <div class="slider-controls">
+                            <button id="next-btn" class="btn-next">Próxima Empresa <i class="fa-solid fa-arrow-right"></i></button>
                         </div>
-                        <button class="buy-action-btn">Comprar</button>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
 
-            <div id="section-sell" class="content-section" style="display: none;">
-                <div class="central-monitor">
-                    <div class="monitor-screen">
-                        <div class="grid-overlay"></div>
-                        <div id="monitor-icon" class="monitor-icon pulse-green">
-                            <i class="fa-solid fa-arrow-up-right-dots"></i>
-                        </div>
-                        <p id="monitor-text">ENERGIA PRONTA PARA DISTRIBUIÇÃO</p>
-                        <div class="progress-container" id="progress-container" style="display: none;">
-                            <div class="progress-fill" id="progress-fill"></div>
-                        </div>
+            {# SEÇÃO 2: AVALIAÇÃO (GLASS TERMINAL) #}
+            <div id="section-rate" class="view-section" style="display: none;">
+                <div class="rating-box-glass">
+                    <h2 id="eval-name">Avaliação</h2>
+                    <p>Selecione o nível de satisfação:</p>
+                    
+                    <div class="star-rating-v2">
+                        <i class="fa-solid fa-star star-btn" data-value="1"></i>
+                        <i class="fa-solid fa-star star-btn" data-value="2"></i>
+                        <i class="fa-solid fa-star star-btn" data-value="3"></i>
+                        <i class="fa-solid fa-star star-btn" data-value="4"></i>
+                        <i class="fa-solid fa-star star-btn" data-value="5"></i>
                     </div>
+
+                    <div id="load-box" style="display: none;">
+                        <div class="custom-loader"></div>
+                        <p>Sincronizando dados com o servidor...</p>
+                    </div>
+
+                    <button id="final-submit" class="btn-confirm-eval" disabled>CONFIRMAR AVALIAÇÃO</button>
                 </div>
-                <button id="sell-btn" class="energy-btn btn-sell">
-                    <i class="fa-solid fa-arrow-up-long"></i> VENDER PARA O MERCADO
-                </button>
             </div>
 
-            <div id="section-done" class="content-section" style="display: none;">
-                <div class="done-card">
-                    <i class="fa-solid fa-circle-check"></i>
-                    <h2>Venda de Energia Próspera!</h2>
-                    <p>O ciclo de hoje foi concluído com sucesso.</p>
+            {# SEÇÃO 3: FINALIZADO (BONECO DANÇANDO) #}
+            <div id="section-done" class="view-section" style="display: none;">
+                <div class="success-screen">
+                    <img src="{% static 'images/done-anim.gif' %}" alt="Sucesso" class="dance-anim">
+                    <h2>Excelente Trabalho!</h2>
+                    <p>Sua avaliação foi processada com sucesso. O saldo já está na sua carteira.</p>
+                    <a href="{% url 'home' %}" class="btn-back">Voltar ao Painel</a>
                 </div>
-                <button class="energy-btn btn-done" disabled>TAREFA CONCLUÍDA</button>
             </div>
 
         </div>
 
-        {# MENSAGENS #}
-        <div id="toast-container"></div>
+        {# CARD DE PUBLICIDADE PREMIUM #}
+        <div class="ads-card-premium">
+            <div class="ad-label">PUBLICIDADE</div>
+            <img src="{% static 'images/ad-premium.jpg' %}" alt="Ads">
+            <div class="ad-info">
+                <span>Anuncie aqui sua marca para milhares de usuários.</span>
+            </div>
+        </div>
 
     </div>
 </div>
 
 <style>
+    /* VARIÁVEIS E BASE */
     :root {
-        --total-red: #ed0000;
-        --total-blue: #002d72;
-        --total-green: #00a94f;
-        --bg-color: #f4f7f6;
-        --card-bg: #ffffff;
+        --glass: rgba(255, 255, 255, 0.15);
+        --glass-border: rgba(255, 255, 255, 0.3);
+        --gold: #ffcc00;
+        --success: #00ff88;
     }
 
-    body { background: var(--bg-color); font-family: 'Outfit', sans-serif; margin: 0; }
+    .work-wrapper { min-height: 100vh; position: relative; display: flex; justify-content: center; padding: 20px 0; }
+    .glass-overlay { position: absolute; top:0; left:0; width: 100%; height: 100%; background: rgba(0, 15, 30, 0.7); backdrop-filter: blur(8px); z-index: 1; }
+    .work-container { position: relative; z-index: 2; width: 95%; max-width: 450px; display: flex; flex-direction: column; gap: 20px; }
 
-    .energy-terminal-wrapper { width: 100%; display: flex; justify-content: center; min-height: 100vh; }
-    .energy-terminal { width: 100%; max-width: 500px; background: white; min-height: 100vh; display: flex; flex-direction: column; }
+    /* HEADER */
+    .header-premium { background: var(--glass); border: 1px solid var(--glass-border); padding: 20px; border-radius: 20px; display: flex; justify-content: space-between; align-items: center; }
+    .logo-circle { width: 45px; height: 45px; background: white; color: #003366; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 900; box-shadow: 0 0 15px rgba(255,255,255,0.3); }
+    .brand-text h1 { color: white; font-size: 18px; margin: 0; }
+    .brand-text p { color: var(--gold); font-size: 10px; margin: 0; text-transform: uppercase; }
+    .badge-status { background: var(--success); color: #003366; padding: 5px 12px; border-radius: 10px; font-size: 11px; font-weight: 800; }
+    .badge-status.is-free { background: var(--gold); }
 
-    .energy-header { 
-        display: flex; justify-content: space-between; align-items: center; 
-        background: var(--total-blue); color: white; padding: 20px 15px;
-    }
-    .brand-section { display: flex; gap: 10px; align-items: center; }
-    .total-logo { 
-        background: white; color: var(--total-blue); width: 35px; height: 35px; 
-        display: flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 20px;
-    }
-    .brand-name { font-weight: 800; font-size: 18px; display: block; line-height: 1; }
-    .terminal-id { font-size: 10px; opacity: 0.7; font-family: 'JetBrains Mono'; }
+    /* TASK INFO & CARDS */
+    .task-info-card { text-align: center; color: white; font-size: 13px; margin-bottom: 20px; }
+    .mini-alert { background: rgba(255,204,0,0.2); border: 1px solid var(--gold); display: inline-block; padding: 5px 15px; border-radius: 15px; margin-top: 10px; }
 
-    .status-bar { width: 80px; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; overflow: hidden; margin-top: 5px; }
-    .status-fill { width: 80%; height: 100%; background: var(--total-green); }
+    .company-card-premium { background: white; border-radius: 25px; padding: 25px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); animation: slideIn 0.5s ease; margin-bottom: 15px; }
+    .comp-icon-box { width: 70px; height: 70px; background: #f0f4f8; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 30px; color: #003366; }
+    .comp-details h3 { margin: 0; color: #333; }
+    .comp-details .category { color: #888; font-size: 12px; }
+    .comp-details .description { font-size: 12px; color: #666; margin: 15px 0; line-height: 1.4; }
+    .btn-start-eval { width: 100%; background: #003366; color: white; border: none; padding: 12px; border-radius: 15px; font-weight: 700; cursor: pointer; transition: 0.3s; }
 
-    .task-tabs { display: flex; border-bottom: 1px solid #eee; }
-    .tab-item { 
-        flex: 1; padding: 15px; text-align: center; font-size: 13px; font-weight: 700; 
-        color: #94a3b8; display: flex; flex-direction: column; gap: 5px; cursor: pointer;
-    }
-    .tab-item.active { color: var(--total-blue); border-bottom: 3px solid var(--total-blue); }
-    .tab-item.disabled { pointer-events: none; opacity: 0.4; }
+    .slider-controls { display: flex; justify-content: center; margin-top: 10px; }
+    .btn-next { background: var(--glass); border: 1px solid var(--glass-border); color: white; padding: 10px 20px; border-radius: 30px; font-size: 13px; cursor: pointer; }
 
-    .main-display { padding: 15px; flex-grow: 1; }
-    .section-title { font-size: 16px; margin-bottom: 15px; color: #475569; }
-    .energy-list { display: flex; flex-direction: column; gap: 12px; }
-    .energy-item { 
-        display: flex; align-items: center; padding: 12px; background: #f8fafc; 
-        border: 1px solid #e2e8f0; border-radius: 12px; gap: 12px;
-    }
-    .item-icon { width: 45px; height: 45px; background: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: var(--total-blue); font-size: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .item-info { flex-grow: 1; }
-    .item-info strong { display: block; font-size: 14px; color: #1e293b; }
-    .item-info span { font-size: 11px; color: #64748b; }
-    .buy-action-btn { background: var(--total-blue); color: white; border: none; padding: 8px 15px; border-radius: 8px; font-weight: bold; font-size: 12px; cursor: pointer; }
+    /* RATING GLASS */
+    .rating-box-glass { background: var(--glass); border: 1px solid var(--glass-border); padding: 40px 20px; border-radius: 30px; text-align: center; color: white; }
+    .star-rating-v2 { margin: 25px 0; font-size: 35px; color: rgba(255,255,255,0.2); }
+    .star-rating-v2 i.active { color: var(--gold); text-shadow: 0 0 15px var(--gold); }
+    .btn-confirm-eval { width: 100%; padding: 15px; border-radius: 15px; border: none; background: grey; color: white; font-weight: 700; }
+    .btn-confirm-eval.ready { background: var(--success); color: #003366; cursor: pointer; }
 
-    .central-monitor { 
-        background: #0f172a; border-radius: 15px; padding: 50px 20px; text-align: center; 
-        margin-bottom: 20px; position: relative; overflow: hidden;
-    }
-    .monitor-icon { font-size: 50px; margin-bottom: 15px; }
-    .pulse-green { color: var(--total-green); animation: pulse 2s infinite; }
-    #monitor-text { color: white; font-family: 'JetBrains Mono'; font-size: 13px; }
+    /* SUCCESS SCREEN */
+    .success-screen { text-align: center; color: white; }
+    .dance-anim { width: 180px; margin-bottom: 20px; }
+    .btn-back { display: inline-block; margin-top: 20px; color: var(--gold); text-decoration: none; border: 1px solid var(--gold); padding: 10px 25px; border-radius: 20px; }
 
-    .energy-btn {
-        width: 100%; padding: 18px; border-radius: 12px; border: none; font-weight: 800; 
-        font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;
-    }
-    .btn-sell { background: var(--total-green); color: white; box-shadow: 0 4px 15px rgba(0, 169, 79, 0.3); }
-    .btn-done { background: #e2e8f0; color: #94a3b8; }
+    /* ADS */
+    .ads-card-premium { background: var(--glass); border-radius: 20px; overflow: hidden; border: 1px solid var(--glass-border); }
+    .ad-label { font-size: 9px; color: white; opacity: 0.5; padding: 5px 15px; }
+    .ads-card-premium img { width: 100%; height: 120px; object-fit: cover; }
+    .ad-info { padding: 10px; color: white; font-size: 10px; text-align: center; }
 
-    .done-card { text-align: center; padding: 40px 20px; }
-    .done-card i { font-size: 60px; color: var(--total-green); margin-bottom: 15px; }
-    .done-card h2 { color: #1e293b; margin-bottom: 5px; }
-
-    .progress-container { width: 100%; height: 6px; background: #1e293b; border-radius: 3px; margin-top: 20px; }
-    .progress-fill { height: 100%; background: var(--total-green); width: 0%; transition: 0.1s; }
-
-    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+    /* LOADER */
+    .custom-loader { width: 40px; height: 40px; border: 4px solid var(--glass-border); border-top-color: var(--success); border-radius: 50%; animation: spin 1s linear infinite; margin: 20px auto; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 </style>
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    const buyActionBtns = document.querySelectorAll('.buy-action-btn');
-    const sellBtn = document.getElementById('sell-btn');
-    
-    const sectionBuy = document.getElementById('section-buy');
-    const sectionSell = document.getElementById('section-sell');
-    const sectionDone = document.getElementById('section-done');
-    
-    const tabBuy = document.getElementById('tab-buy-control');
-    const tabSell = document.getElementById('tab-sell-control');
-    
-    const progressContainer = document.getElementById('progress-container');
-    const progressFill = document.getElementById('progress-fill');
+    let currentIndex = 0;
+    const cards = document.querySelectorAll('.company-card-premium');
+    const totalCompanies = cards.length;
 
-    // Se já terminou a tarefa do dia
+    function updateSlider() {
+        cards.forEach(card => card.style.display = 'none');
+        // Exibe 2 por vez (ou 1 se for o último)
+        if(cards[currentIndex]) cards[currentIndex].style.display = 'block';
+        if(cards[currentIndex + 1]) cards[currentIndex + 1].style.display = 'block';
+    }
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+        currentIndex += 2;
+        if (currentIndex >= totalCompanies) currentIndex = 0;
+        updateSlider();
+    });
+
+    // Inicializa o slider
+    updateSlider();
+
+    const btnEvals = document.querySelectorAll('.btn-start-eval');
+    const starBtns = document.querySelectorAll('.star-btn');
+    const finalSubmit = document.getElementById('final-submit');
+    const sectionSelect = document.getElementById('section-select');
+    const sectionRate = document.getElementById('section-rate');
+    const sectionDone = document.getElementById('section-done');
+    const evalName = document.getElementById('eval-name');
+
     if ({{ tasks_completed_today|default:0 }} >= 1) {
         showSection('done');
     }
 
-    buyActionBtns.forEach(btn => {
+    btnEvals.forEach(btn => {
         btn.addEventListener('click', function() {
-            btn.disabled = true;
-            btn.textContent = "Aguarde...";
-            setTimeout(() => {
-                showSection('sell');
-            }, 800);
+            const company = btn.parentElement.querySelector('h3').innerText;
+            evalName.innerText = company;
+            showSection('rate');
         });
     });
 
-    sellBtn.addEventListener('click', function() {
-        sellBtn.disabled = true;
-        sellBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> TRANSMITINDO...';
-        
-        progressContainer.style.display = 'block';
-        let width = 0;
-        let interval = setInterval(() => {
-            if (width >= 100) {
-                clearInterval(interval);
-            } else {
-                width += 5;
-                progressFill.style.width = width + '%';
-            }
-        }, 100);
+    starBtns.forEach(star => {
+        star.addEventListener('click', function() {
+            const val = this.getAttribute('data-value');
+            starBtns.forEach(s => {
+                s.classList.remove('active');
+                if (s.getAttribute('data-value') <= val) s.classList.add('active');
+            });
+            finalSubmit.disabled = false;
+            finalSubmit.classList.add('ready');
+        });
+    });
+
+    finalSubmit.addEventListener('click', function() {
+        this.style.display = 'none';
+        document.getElementById('load-box').style.display = 'block';
 
         fetch("{% url 'process_task' %}", {
             method: 'POST',
@@ -261,25 +256,12 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 
     function showSection(type) {
-        sectionBuy.style.display = 'none';
-        sectionSell.style.display = 'none';
+        sectionSelect.style.display = 'none';
+        sectionRate.style.display = 'none';
         sectionDone.style.display = 'none';
-        
-        tabBuy.classList.remove('active');
-        tabSell.classList.remove('active');
-
-        if (type === 'sell') {
-            sectionSell.style.display = 'block';
-            tabSell.classList.remove('disabled');
-            tabSell.classList.add('active');
-        } else if (type === 'done') {
-            sectionDone.style.display = 'block';
-            tabSell.classList.remove('disabled');
-            tabSell.classList.add('active');
-        } else {
-            sectionBuy.style.display = 'block';
-            tabBuy.classList.add('active');
-        }
+        if (type === 'rate') sectionRate.style.display = 'block';
+        else if (type === 'done') sectionDone.style.display = 'block';
+        else sectionSelect.style.display = 'block';
     }
 });
 </script>

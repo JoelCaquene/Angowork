@@ -1,350 +1,273 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}totalenergies - Terminal Profissional{% endblock %}
+{% block title %}ANGOWORK - Dashboard Profissional{% endblock %}
 
 {% block content %}
+{# 1. MODAL DE BOAS-VINDAS PERSONALIZADO #}
 <div id="welcomeModal" class="modal-overlay">
-    <div class="modal-content">
-        <div class="modal-body">
-            <h2 style="font-size: 18px; color: #2d3436; margin-bottom: 15px;">Visite o Grupo Geral</h2>
-            <a href="{{ whatsapp_link }}" target="_blank" class="btn-whatsapp-pop">
-                <i class="fab fa-whatsapp"></i> ENTRAR NO GRUPO
+    <div class="modal-content-custom glass-effect animate-in">
+        <div class="modal-header-custom">
+            <h2 class="modal-logo">ANGOWORK</h2>
+            <p class="modal-subtitle">Informativo Oficial</p>
+        </div>
+        
+        <div class="modal-body-scroll">
+            <div class="info-item">
+                <i class="fas fa-calendar-alt"></i>
+                <p><strong>Horário:</strong> Segunda a Sábado (Domingo não prestamos serviços).</p>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-clock"></i>
+                <p><strong>Atendimento:</strong> 08:30 às 21:00.</p>
+            </div>
+            
+            <hr class="modal-divider">
+            
+            <div class="modal-text-content">
+                <p>Não somos uma plataforma de investimento, mas sim uma <strong>empresa de rendimento online</strong>.</p>
+                <p>O seu depósito servirá de garantia do seu compromisso com a empresa.</p>
+                <p>Após <strong>1 ano de serviço</strong> contínuo, o seu valor de garantia será totalmente reembolsado.</p>
+            </div>
+
+            <a href="{{ whatsapp_link }}" target="_blank" class="btn-whatsapp-custom">
+                <div class="whatsapp-icon-animate">
+                    <i class="fab fa-whatsapp"></i>
+                </div>
+                <span>ENTRAR NO GRUPO GERAL</span>
             </a>
         </div>
-        <button class="btn-close-modal" onclick="closeModal()">Entendido</button>
+
+        <div class="modal-footer-custom">
+            <button class="btn-close-modal-new" onclick="closeModal()">CONCORDAR E CONTINUAR</button>
+        </div>
     </div>
 </div>
 
 <div class="forex-dashboard">
-
-    {# 1. Banner Carrossel #}
-    <div class="carousel-container">
-        <img src="{% static 'images/banner_carrossel.jpg' %}" alt="Banner" class="carousel-img">
+    
+    {# TOPO SUPERIOR #}
+    <div class="top-header">
+        <a href="{% url 'logout' %}" class="btn-sair-topo">SAIR</a>
+        <h1 class="logo-angowork">ANGOWORK</h1>
+        <div style="width: 50px;"></div>
     </div>
 
-    {# 2. Grid de Botões com Novos Ícones e Cores #}
-    <div class="action-grid">
+    {# PAINEL DE INDICADORES (6 INDICADORES) #}
+    <div class="indicators-grid glass-effect">
+        <div class="indicator-sq">
+            <span class="ind-label">Função</span>
+            <span class="ind-value">{% if active_level %}{{ active_level.level.name }}{% else %}Função 0{% endif %}</span>
+        </div>
+        <div class="indicator-sq">
+            <span class="ind-label">Saldo</span>
+            <span class="ind-value">KZ {{ user.available_balance|default:"0.00" }}</span>
+        </div>
+        <div class="indicator-sq">
+            <span class="ind-label">Garantia</span>
+            <span class="ind-value">KZ {{ approved_deposit_total|default:"0" }}</span>
+        </div>
+        
+        <div class="indicator-sq">
+            <span class="ind-label">HOJE</span>
+            <span class="ind-value">KZ {{ daily_income|default:"0.00" }}</span>
+        </div>
+        <div class="indicator-sq">
+            <span class="ind-label">Subsídios</span>
+            <span class="ind-value">KZ {{ user.subsidy_balance|default:"0.00" }}</span>
+        </div>
+        <div class="indicator-sq">
+            <span class="ind-label">SAQUES APROVADOS</span>
+            <span class="ind-value">KZ {{ total_withdrawals|default:"0.00" }}</span>
+        </div>
+    </div>
+
+    {# GRID DE AÇÕES #}
+    <div class="action-grid glass-effect">
         <a href="{% url 'deposito' %}" class="action-item">
-            <div class="icon-box bg-gold"><i class="fas fa-piggy-bank"></i></div>
-            <span>Depósito</span>
+            <div class="icon-box-dark"><i class="fas fa-piggy-bank"></i></div>
+            <span>Garantia</span>
         </a>
         <a href="{% url 'tarefa' %}" class="action-item">
-            <div class="icon-box bg-cyan"><i class="fas fa-clipboard-check"></i></div>
-            <span>Trabalho</span>
-        </a>
-        <a href="{% url 'roleta' %}" class="action-item">
-            <div class="icon-box bg-orange"><i class="fas fa-trophy"></i></div>
-            <span>Sorteio da Sorte</span>
-        </a>
-        <a href="{% url 'sobre' %}" class="action-item">
-            <div class="icon-box bg-indigo"><i class="fas fa-university"></i></div>
-            <span>Anúncios</span>
-        </a>
-        <a href="{% url 'saque' %}" class="action-item">
-            <div class="icon-box bg-emerald"><i class="fas fa-money-check-alt"></i></div>
-            <span>Salário</span>
-        </a>
-
-        <a href="{% url 'home' %}" class="action-item">
-            <div class="icon-box bg-rose"><i class="fas fa-th-large"></i></div>
-            <span>Início</span>
+            <div class="icon-box-dark"><i class="fas fa-briefcase"></i></div>
+            <span>Actividade</span>
         </a>
         <a href="{% url 'nivel' %}" class="action-item">
-            <div class="icon-box bg-amber"><i class="fas fa-crown"></i></div>
-            <span>Plano</span>
+            <div class="icon-box-dark"><i class="fas fa-crown"></i></div>
+            <span>Função</span>
         </a>
-        <a href="{% url 'renda' %}" class="action-item">
-            <div class="icon-box bg-lime"><i class="fas fa-seedling"></i></div>
-            <span>Rendimento</span>
+        <a href="{% url 'sobre' %}" class="action-item">
+            <div class="icon-box-dark"><i class="fas fa-bullhorn"></i></div>
+            <span>Tutoria</span>
+        </a>
+        <a href="{% url 'saque' %}" class="action-item">
+            <div class="icon-box-dark"><i class="fas fa-hand-holding-dollar"></i></div>
+            <span>ATM</span>
+        </a>
+    </div>
+
+    <div 
+        </p>.</div>
+    </div>
+{# SEÇÃO DE APOIO CLIENTE #}
+    <div class="licenca-container" style="text-align: center; padding: 20px;">
+        <img src="{% static 'images/logo_isj.png' %}" alt="Logo ISJ" class="isj-logo" style="max-width: 80px; margin-bottom: 10px;">
+        
+        <p class="licenca-texto" style="font-weight: bold; color: #25D366; margin-bottom: 15px;">
+            <i class="fab fa-whatsapp"></i> SUPORTE WHATSAPP
+        </p>
+
+        <p style="margin-bottom: 10px;">
+            <a href="https://wa.me/15488715435" target="_blank" style="text-decoration: none; color: inherit; font-weight: 600;">
+                <i class="fas fa-external-link-alt" style="font-size: 0.8rem; opacity: 0.7;"></i> +1 (548) 871-5435
+            </a>
+        </p>
+
+        <p style="margin-bottom: 10px;">
+            <a href="https://wa.me/15488716128" target="_blank" style="text-decoration: none; color: inherit; font-weight: 600;">
+                <i class="fas fa-external-link-alt" style="font-size: 0.8rem; opacity: 0.7;"></i> +1 (548) 871-6128
+            </a>
+        </p>
+
+        <p style="margin-bottom: 10px;">
+            <a href="https://wa.me/12495282836" target="_blank" style="text-decoration: none; color: inherit; font-weight: 600;">
+                <i class="fas fa-external-link-alt" style="font-size: 0.8rem; opacity: 0.7;"></i> +1 (249) 528-2836
+            </a>
+        </p>
+    </div>
+
+    {# BARRA INFERIOR #}
+    <div class="bottom-nav glass-effect">
+        <a href="{% url 'perfil' %}" class="action-item">
+            <div class="icon-box-black"><i class="fas fa-university"></i></div>
+            <span>IBAN</span>
+        </a>
+        <a href="{% url 'nivel' %}" class="action-item">
+            <div class="icon-box-black"><i class="fas fa-crown"></i></div>
+            <span>Função</span>
+        </a>
+        <a href="{% url 'roleta' %}" class="action-item">
+            <div class="icon-box-black btn-sorteio-anim"><i class="fas fa-dharmachakra"></i></div>
+            <span style="color: #ffcc00; font-weight: bold;">Sorteio</span>
         </a>
         <a href="{% url 'equipa' %}" class="action-item">
-            <div class="icon-box bg-sky"><i class="fas fa-network-wired"></i></div>
+            <div class="icon-box-black"><i class="fas fa-users"></i></div>
             <span>Afiliados</span>
         </a>
-        <a href="{% url 'perfil' %}" class="action-item">
-            <div class="icon-box bg-violet"><i class="fas fa-user-tie"></i></div>
-            <span>Eu</span>
+        <a href="{% url 'change_password' %}" class="action-item">
+            <div class="icon-box-black"><i class="fas fa-user-shield"></i></div>
+            <span>Senha</span>
         </a>
     </div>
 
-    {# 3. Seção de Perguntas e Respostas (FAQ) #}
-    <div class="faq-section">
-        <h3 class="faq-title"><i class="fas fa-question-circle"></i> Perguntas Frequentes</h3>
-        
-        <div class="faq-container">
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>1. De que origem é a empresa TotalEnergies?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">
-                    A TotalEnergies é uma empresa de origem francesa. Sua sede principal está localizada em Courbevoie, no distrito de La Défense, em Paris.
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>2. Quando a Plataforma surgiu em Angola?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">No dia 19 de Janeiro de 2026, as 07:00h</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>3. Quanto tempo irão ficar no mercado Angolano?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">A nossa empresa, possui uma licença renovavel, e permitido a atuar em Angola, por mas de 5 anos.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>4. Qual é o objectivo da Plataforma?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">É atuar no campo de empregabidade online, diminuindo assim, desimprego na população angolana.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>5. Dias de trabalho da empresa?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">Trabalhamos de segunda a Sábado.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>6. Dias de realização de tarefas?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">Tarefas são realizadas de segunda a Sexta Feira.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>7. Dias de saque?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">Saques são realizados de segunda a sexta.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>8. Qual é o saque minimo?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">Saque minimo é 3000 Kz.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>9. Qual é o investimento Minimo?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">Investimento minimo é 10.000 Kz.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>10. Horarios de saque?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">Das 09:00 até 17:00 horas.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>11. Quanto tempo leva para o saque ser pago?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">Leva 0 Minutos a 48 horas, pode váriar de dia para dia.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>12. Horarios de deposito?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">Das 08:30 até as 21:00.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>13. Quanto tempo dura para o deposito ser aprovado?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">5 minutos a 15 minutos, porque os comprovativos são verificados cuidadosamente nos nossos aplicativos de consultas online Banking de cada banco.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>14. É permitido comprar mais de 1 produto?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">Não só podes comprar 1 produto, se desejar subir de Plano realiza outro deposito e nos voltamos valor do deposito anterior.</div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>15. O que fazer para trabalhar na área administrativa da empresa?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">Deve possuir um plano activo superior de plano 3, e aguardar sempre os anuncios de vagas.</div>
-            </div>
-        </div>
-
-         <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>16. Para começar a ganhar é obrigatório investir?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">Não necessáriamente, você pode optar trabalhar com plano 0, que é gratuito e ganhar diariamente 80 KZ, mas lembre se que os planos pagos os rendimentos são mas altos</div>
-            </div>
-        </div>
-
-        <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>17. É permitido ter dois planos ao mesmo tempo?</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="faq-answer">Não, apenas pode ter um Plano, se futuramente desejar, atualizar, nos rembolsamos o valor do plano anterior, com desconto de 30%</div>
-            </div>
-        </div>
-
-                <div class="support-footer">
-            <p>Ainda tem dúvidas? Contacte o Apoio ao Cliente:</p>
-            <p>Copie, e guarde o número, e deixa mensagem no whatsapp:</p>
-            <div class="whatsapp-list">
-                <span>+55 86 9510-4007</span> | <span>+55 86 8886-1399</span> | <span>+55 86 9577-7679</span>
-            </div>
-        </div>
-    </div>
 </div>
 
 <style>
     :root {
-        --bg-light: #f8f9fa;
-        --text-dark: #2d3436;
-        --primary: #0056b3;
+        --text-white: #ffffff;
+        --glass-bg: rgba(255, 255, 255, 0.08);
+        --blue-dark: #002d5e;
+        --black-pure: #000000;
+        --whatsapp-green: #25d366;
     }
 
     html, body {
-        max-width: 100%;
-        overflow-x: hidden;
-        margin: 0;
-        padding: 0;
-        background-color: var(--bg-light);
+        margin: 0; padding: 0;
+        background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url("{% static 'background_cad.jpg' %}") no-repeat center center fixed;
+        background-size: cover;
         font-family: 'Poppins', sans-serif;
-    }
-
-    /* CARROSSEL */
-    .carousel-container {
-        width: 100%;
-        height: 140px;
-        overflow: hidden;
-    }
-    .carousel-img { width: 100%; height: 100%; object-fit: cover; }
-
-    /* GRID DE BOTÕES */
-    .action-grid {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 5px;
-        padding: 15px 8px;
-        background: white;
-    }
-    .action-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-decoration: none;
-        color: #636e72;
-    }
-    .icon-box {
-        width: 45px;
-        height: 45px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 5px;
-        font-size: 18px;
         color: white;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    .action-item span { font-size: 8px; font-weight: 700; text-transform: uppercase; }
 
-    /* CORES DOS ÍCONES (Paleta Profissional) */
-    .bg-gold { background: linear-gradient(135deg, #FFD700, #DAA520); }
-    .bg-cyan { background: linear-gradient(135deg, #00ced1, #20b2aa); }
-    .bg-orange { background: linear-gradient(135deg, #ff8c00, #ff4500); }
-    .bg-indigo { background: linear-gradient(135deg, #4b0082, #6a5acd); }
-    .bg-emerald { background: linear-gradient(135deg, #10b981, #059669); }
-    .bg-rose { background: linear-gradient(135deg, #f43f5e, #e11d48); }
-    .bg-amber { background: linear-gradient(135deg, #f59e0b, #d97706); }
-    .bg-lime { background: linear-gradient(135deg, #84cc16, #65a30d); }
-    .bg-sky { background: linear-gradient(135deg, #0ea5e9, #0284c7); }
-    .bg-violet { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+    .forex-dashboard { width: 100%; max-width: 500px; margin: 0 auto; padding-bottom: 110px; }
 
-    /* SEÇÃO FAQ */
-    .faq-section { padding: 20px 15px; background: #fff; margin-top: 10px; }
-    .faq-title { font-size: 16px; color: #2d3436; margin-bottom: 15px; border-left: 4px solid #0056b3; padding-left: 10px; }
-    .faq-item { border-bottom: 1px solid #f1f2f6; }
-    .faq-question {
-        padding: 12px 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
-        font-size: 12px;
-        font-weight: 600;
-        color: #2d3436;
+    /* --- MODAL STYLE --- */
+    .modal-overlay { 
+        position: fixed; inset: 0; background: rgba(0,0,0,0.9); 
+        display: flex; justify-content: center; align-items: center; 
+        z-index: 10000; backdrop-filter: blur(8px); 
     }
-    .faq-question i { font-size: 10px; transition: 0.3s; color: #b2bec3; }
-    .faq-answer {
-        max-height: 0;
-        overflow: hidden;
-        transition: 0.3s ease-out;
-        font-size: 11px;
-        color: #636e72;
-        line-height: 1.6;
-        padding-bottom: 0;
+    .modal-content-custom { 
+        width: 85%; max-width: 320px; max-height: 80vh; 
+        background: rgba(20, 20, 20, 0.95);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 25px; display: flex; flex-direction: column; overflow: hidden;
     }
-    .faq-item.active .faq-answer { max-height: 200px; padding-bottom: 15px; }
-    .faq-item.active .faq-question i { transform: rotate(180deg); color: #0056b3; }
+    .animate-in { animation: modalShow 0.4s ease-out; }
+    @keyframes modalShow { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
-    .support-footer { text-align: center; margin-top: 25px; padding: 15px; background: #f8f9fa; border-radius: 10px; }
-    .support-footer p { font-size: 11px; color: #636e72; margin-bottom: 5px; }
-    .whatsapp-list { font-size: 12px; font-weight: 700; color: #0056b3; }
+    .modal-header-custom { padding: 20px 15px 10px; text-align: center; }
+    .modal-logo { font-size: 20px; font-weight: 900; letter-spacing: 2px; margin: 0; }
+    .modal-subtitle { font-size: 10px; color: #3b82f6; font-weight: bold; text-transform: uppercase; margin-top: 5px; }
 
-    /* MODAL */
-    .modal-overlay {
-        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center;
-        z-index: 9999; backdrop-filter: blur(4px);
+    .modal-body-scroll { padding: 15px 20px; overflow-y: auto; flex: 1; }
+    .modal-body-scroll::-webkit-scrollbar { width: 3px; }
+    .modal-body-scroll::-webkit-scrollbar-thumb { background: #444; border-radius: 10px; }
+
+    .info-item { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .info-item i { color: #3b82f6; font-size: 14px; }
+    .info-item p { font-size: 12px; margin: 0; color: #ddd; }
+
+    .modal-divider { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 15px 0; }
+    .modal-text-content p { font-size: 12px; line-height: 1.6; color: #bbb; margin-bottom: 12px; text-align: center; }
+
+    /* WHATSAPP PERSONALIZADO */
+    .btn-whatsapp-custom { 
+        background: var(--whatsapp-green); color: white; text-decoration: none; 
+        padding: 12px; border-radius: 15px; display: flex; justify-content: center; 
+        align-items: center; gap: 10px; font-size: 11px; font-weight: bold; margin-top: 10px;
+        box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
     }
-    .modal-content {
-        background: white; width: 85%; max-width: 300px; border-radius: 15px;
-        padding: 25px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    .whatsapp-icon-animate {
+        font-size: 18px;
+        animation: pulse-green 2s infinite;
     }
-    .btn-whatsapp-pop {
-        background: #25d366; color: white; text-decoration: none; padding: 12px;
-        border-radius: 8px; display: block; font-weight: bold; margin: 15px 0; font-size: 13px;
+    @keyframes pulse-green {
+        0% { transform: scale(1); text-shadow: 0 0 0 rgba(255,255,255, 0.7); }
+        70% { transform: scale(1.2); text-shadow: 0 0 10px rgba(255,255,255, 0); }
+        100% { transform: scale(1); text-shadow: 0 0 0 rgba(255,255,255, 0); }
     }
-    .btn-close-modal { border: none; background: none; color: #b2bec3; cursor: pointer; font-size: 12px; font-weight: 600; }
+
+    .btn-close-modal-new { 
+        width: 100%; border: none; background: #fff; color: #000; 
+        padding: 14px; font-size: 12px; font-weight: 800; cursor: pointer;
+    }
+
+    /* --- DASHBOARD STYLE --- */
+    .top-header { display: flex; justify-content: space-between; align-items: center; padding: 15px; }
+    .logo-angowork { font-weight: 900; font-size: 22px; color: #fff; }
+    .btn-sair-topo { background: #ff4444; color: white; padding: 5px 12px; border-radius: 6px; text-decoration: none; font-size: 10px; font-weight: bold; }
+
+    .indicators-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px; padding: 12px; border-radius: 15px; }
+    .indicator-sq { display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.05); padding: 12px 2px; border-radius: 10px; }
+    .ind-label { font-size: 7px; color: #aaa; text-transform: uppercase; margin-bottom: 4px; text-align: center; }
+    .ind-value { font-size: 9px; font-weight: bold; color: #fff; }
+
+    .action-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin: 15px 10px; padding: 15px 5px; border-radius: 15px; }
+    .icon-box-dark { width: 42px; height: 42px; background: var(--blue-dark); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 6px; font-size: 18px; }
+
+    .licenca-container { margin: 20px 15px; padding: 15px; text-align: center; background: rgba(0,0,0,0.4); border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); }
+    .isj-logo { width: 70px; margin-bottom: 10px; opacity: 0.8; }
+    .licenca-texto { font-size: 9px; color: #aaa; line-height: 1.4; margin: 0; }
+
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; max-width: 500px; margin: 0 auto; display: grid; grid-template-columns: repeat(5, 1fr); padding: 10px 5px; background: #000 !important; z-index: 999; border-radius: 20px 20px 0 0; }
+    .icon-box-black { width: 40px; height: 40px; background: #111; color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 5px; font-size: 16px; border: 1px solid #222; }
+
+    .btn-sorteio-anim i { color: #ffcc00; animation: spin-slow 3s linear infinite; }
+    @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    .action-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: white; }
+    .action-item span { font-size: 8px; font-weight: 500; text-transform: uppercase; }
+
+    .glass-effect { background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
 </style>
 
 <script>
     function closeModal() {
-        document.getElementById('welcomeModal').style.display = 'none';
-    }
-
-    function toggleFaq(element) {
-        const item = element.parentElement;
-        item.classList.toggle('active');
+        const modal = document.getElementById('welcomeModal');
+        modal.style.transition = 'opacity 0.3s ease';
+        modal.style.opacity = '0';
+        setTimeout(() => { modal.style.display = 'none'; }, 300);
     }
 </script>
 {% endblock %}
